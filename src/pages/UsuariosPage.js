@@ -11,6 +11,29 @@ import {
 } from 'mdbreact';
 import MenuLink from '../components/menuLink';
 import MyDatatablePage from '../pages/MyDatatablePage';
+import axios from 'axios';
+
+async function registrarUsuario() {
+  
+  let regName = document.getElementById('regName').value;
+  let regEmail = document.getElementById('regEmail').value;
+ 
+  let reqData = {
+    "name": regName, 
+    "credential": {
+      "email": regEmail, 
+      "password": "DummyPassword321", 
+      "password_confirmation": "DummyPassword321",
+      "admin": false, 
+      "active": "false"
+    }
+  }
+  
+  console.log(reqData);
+  const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users', reqData);
+  console.log(response.data);
+  window.location.reload(false);
+} //registrarUsuario()
 
 const CSSPage = () => {
   return (
@@ -31,11 +54,11 @@ const CSSPage = () => {
                 <MDBJumbotron className='mt-3'>
                   <h4 className='text-center'>Registrar usuario</h4><br />
                   <form>
-                  <input type="text" placeholder="Nombre completo" id="defaultFormLoginEmailEx" className="form-control" />
+                  <input id="regName" type="text" placeholder="Nombre completo" className="form-control" />
                   <br />
-                  <input type="email" placeholder="Correo electrónico" id="defaultFormLoginPasswordEx" className="form-control" />
+                  <input id="regEmail" type="email" placeholder="Correo electrónico" className="form-control" />
                   <div className="text-center mt-4">
-                    <MDBBtn color="indigo" type="submit">Registrar usuario</MDBBtn>
+                    <MDBBtn onClick={registrarUsuario} color="indigo">Registrar usuario</MDBBtn>
                   </div>
                 </form>
                 </MDBJumbotron>

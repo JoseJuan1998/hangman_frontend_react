@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import MaterialTable from 'material-table';
 
 import AddBox from '@material-ui/icons/AddBox';
@@ -16,10 +16,28 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import axios from 'axios';
 
-function MyDatatablePage() {
+async function getUsers() {
+    let myUsers = [];
+        const response = await axios({
+            method: 'get',
+            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users'
+        });
+        for(let i = 0; i < response.data.users.length; i++) {
+            myUsers.push({
+                active: 'false', 
+                name: response.data.users[i].name, 
+                email: response.data.users[i].email
+            });
+        } 
+    //console.log(myUsers);
+    return myUsers;
+ } // getUsers()
 
 
+
+ function MyDatatablePage() {
     const tableIcons = {
         Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
         Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -39,29 +57,32 @@ function MyDatatablePage() {
         ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
       };
-    
+
+        // const emptyList = [
+        //     { active: 'Activa', name: 'Edgar Huemac Sanchez', email: 'edgar@gmail.com' }, 
+        //     { active: 'No activa', name: 'Maria Fernanda Morales', email: 'mafer@gmail.com' }, 
+        //     { active: 'Activa', name: 'Rodrigo Alejandro Quintana', email: 'roy12@outlook.com' }, 
+        //     { active: 'Activa', name: 'Alan Martin Fuentes', email: 'alanfp@outlook.com' }, 
+        // ];
+
+    // State that manages the datatable's data
+    const [data, setData] = useState([]);
     const columns = [
-        {
-            title: 'Estatus', 
-            field: 'estatus'
-        },
-        {
-            title: 'Nombre', 
-            field: 'nombre'
-        },
-        {
-            title: 'Correo electónico', 
-            field: 'email'
-        }
+        { title: 'Estatus', field: 'active' },
+        { title: 'Nombre', field: 'name' },
+        { title: 'Correo electónico', field: 'email' }
     ];
 
 
-    const data = [
-        { estatus: 'Activa', nombre: 'Edgar Huemac Sanchez', email: 'edgar@gmail.com' }, 
-        { estatus: 'No activa', nombre: 'Maria Fernanda Morales', email: 'mafer@gmail.com' }, 
-        { estatus: 'Activa', nombre: 'Rodrigo Alejandro Quintana', email: 'roy12@outlook.com' }, 
-        { estatus: 'Activa', nombre: 'Alan Martin Fuentes', email: 'alanfp@outlook.com' }, 
-    ];
+
+    useEffect(()=>{
+        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users')
+        .then(resp=>resp.json())
+        .then(resp=>{
+            console.log(resp)
+            setData(resp.users)
+        })
+    },[])
 
     return(
         <div>
@@ -74,12 +95,12 @@ function MyDatatablePage() {
                     {
                         icon: Edit, 
                         tooltip: 'Editar usuario', 
-                        onClick: (event, rowData) => window.confirm('Editando a ' + rowData.nombre)
+                        onClick: (event, rowData) => window.confirm('Editando a ' + rowData.name)
                     },
                     {
                         icon: DeleteOutline, 
                         tooltip: 'Eliminar usuario', 
-                        onClick: (event, rowData) => window.confirm('Eliminando a ' + rowData.nombre)
+                        onClick: (event, rowData) => window.confirm('Eliminando a ' + rowData.name)
                     },                    
                 ]}             
             />
