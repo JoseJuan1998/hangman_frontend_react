@@ -64,7 +64,6 @@ const CSSPage = () => {
                 </MDBJumbotron>
             </MDBCol>
           
-
           
           </MDBRow>
 

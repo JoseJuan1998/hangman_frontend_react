@@ -1,4 +1,14 @@
 import React, { forwardRef, useState, useEffect } from 'react';
+import { 
+    MDBContainer, 
+    MDBBtn, 
+    MDBModal, 
+    MDBModalBody, 
+    MDBModalHeader, 
+    MDBModalFooter, 
+    MDBJumbotron
+ } from 'mdbreact';
+ 
 import MaterialTable from 'material-table';
 
 import AddBox from '@material-ui/icons/AddBox';
@@ -17,6 +27,42 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import axios from 'axios';
+import EditUsersPage from '../pages/EditUsersPage';
+import { StylesContext } from '@material-ui/styles';
+
+import { Modal, TextField, Button } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+
+const useStyles = makeStyles((theme) => ({
+    modal: {
+      position: 'absolute',
+      width: 400,
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
+    },
+    iconos:{
+      cursor: 'pointer'
+    }, 
+    inputMaterial:{
+      width: '100%'
+    }
+  }));
+
+  const handleChange=e=>{
+    const {name, value}=e.target;
+    setUsuarioSeleccionado(prevState=>({
+      ...prevState,
+      [name]: value
+    }));
+  }
+
+let listaUsuarios = [];
 
 async function getUsers() {
     let myUsers = [];
@@ -36,8 +82,27 @@ async function getUsers() {
  } // getUsers()
 
 
+ async function eliminarUsuario(rowData) {
+    let userToDelete = rowData.tableData.id;
+    // alert('eliminando a ' + userToDelete);
+    console.log(userToDelete)
+
+    const response = await axios({
+        method: 'delete',
+        url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users/' + userToDelete
+    });
+ } // eliminarUsuario()
+
+
+ async function actualizarUsuario(usuario) {
+    console.log(usuario.usuarioSeleccionado.name);
+    alert('Actualizando usuario' + usuario.usuarioSeleccionado.name + ' con el id ' + usuario.usuarioSeleccionado.id);
+    // axios put here...
+ } // actualizarUsuario()
+
 
  function MyDatatablePage() {
+    const styles= useStyles();
     const tableIcons = {
         Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
         Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -58,7 +123,7 @@ async function getUsers() {
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
       };
 
-        // const emptyList = [
+    // const emptyList = [
         //     { active: 'Activa', name: 'Edgar Huemac Sanchez', email: 'edgar@gmail.com' }, 
         //     { active: 'No activa', name: 'Maria Fernanda Morales', email: 'mafer@gmail.com' }, 
         //     { active: 'Activa', name: 'Rodrigo Alejandro Quintana', email: 'roy12@outlook.com' }, 
@@ -67,20 +132,58 @@ async function getUsers() {
 
     // State that manages the datatable's data
     const [data, setData] = useState([]);
+    const [modalEditar, setModalEditar] = useState(false);
+    const [usuarioSeleccionado, setUsuarioSeleccionado]=useState({
+        name: '',
+        email: '', 
+        id: ''
+      })
+
+
+    const abrirCerrarModalEditar = (rowData = '') => {
+        if(rowData != '') {
+            console.log(rowData);
+            setUsuarioSeleccionado({
+                name: rowData.name,
+                email: rowData.email, 
+                id: rowData.name
+              });
+            // alert(rowData.tableData.id);
+            document.getElementsByName('nombre').value = rowData.tableData.id; 
+        }
+            
+        
+        setModalEditar(!modalEditar);
+    }
+
+
+    const bodyEditar=(
+        <div className={styles.modal}>
+          <h3>Editar usuario</h3>
+        <TextField id="NombreEditar" className={styles.inputMaterial} label="Nombre completo" name="nombre" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.name}/>
+          <br /><br />
+          <div align="right">
+            <Button color="primary" onClick={()=>actualizarUsuario({usuarioSeleccionado})}>Editar</Button>
+            <Button onClick={()=>abrirCerrarModalEditar()}>Cancelar</Button>
+          </div>
+        </div>
+      )
+
+
     const columns = [
         { title: 'Estatus', field: 'active' },
         { title: 'Nombre', field: 'name' },
         { title: 'Correo electónico', field: 'email' }
     ];
 
-
-
     useEffect(()=>{
         fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users')
         .then(resp=>resp.json())
         .then(resp=>{
-            console.log(resp)
+            // console.log(resp)
             setData(resp.users)
+            listaUsuarios = resp.users;
+            console.log(listaUsuarios);
         })
     },[])
 
@@ -95,16 +198,28 @@ async function getUsers() {
                     {
                         icon: Edit, 
                         tooltip: 'Editar usuario', 
-                        onClick: (event, rowData) => window.confirm('Editando a ' + rowData.name)
+                        onClick: (event, rowData) => 
+                        
+                        abrirCerrarModalEditar(rowData)
                     },
                     {
                         icon: DeleteOutline, 
                         tooltip: 'Eliminar usuario', 
-                        onClick: (event, rowData) => window.confirm('Eliminando a ' + rowData.name)
+                        onClick: (event, rowData) => 
+                        eliminarUsuario(rowData)
                     },                    
                 ]}             
             />
+
+
+        <Modal
+            open={modalEditar}
+            onClose={abrirCerrarModalEditar}>
+            {bodyEditar}
+        </Modal>
+
         </div>
+        
     );
 
 } // MyDatatablePage()
