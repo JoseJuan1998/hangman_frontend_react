@@ -54,13 +54,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-  const handleChange=e=>{
-    const {name, value}=e.target;
-    setUsuarioSeleccionado(prevState=>({
-      ...prevState,
-      [name]: value
-    }));
-  }
+
 
 let listaUsuarios = [];
 
@@ -68,7 +62,7 @@ async function getUsers() {
     let myUsers = [];
         const response = await axios({
             method: 'get',
-            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users'
+            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users'
         });
         for(let i = 0; i < response.data.users.length; i++) {
             myUsers.push({
@@ -83,21 +77,32 @@ async function getUsers() {
 
 
  async function eliminarUsuario(rowData) {
-    let userToDelete = rowData.tableData.id;
+    let userToDelete = rowData.id;
     // alert('eliminando a ' + userToDelete);
     console.log(userToDelete)
 
     const response = await axios({
         method: 'delete',
-        url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users/' + userToDelete
+        url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete
     });
+    window.location.reload(false);
  } // eliminarUsuario()
 
 
  async function actualizarUsuario(usuario) {
     console.log(usuario.usuarioSeleccionado.name);
-    alert('Actualizando usuario' + usuario.usuarioSeleccionado.name + ' con el id ' + usuario.usuarioSeleccionado.id);
+    // alert('Actualizando usuario' + usuario.usuarioSeleccionado.name + ' con el id ' + usuario.usuarioSeleccionado.id + 'a ' + document.getElementById('NombreEditar').value);
+    console.log(usuario.usuarioSeleccionado);
     // axios put here...
+
+    let reqData = {
+        "name":  document.getElementById('NombreEditar').value
+      }
+    const response = await axios.put(
+        'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/name/' + usuario.usuarioSeleccionado.id, 
+        reqData
+        );
+        window.location.reload(false);
  } // actualizarUsuario()
 
 
@@ -139,6 +144,14 @@ async function getUsers() {
         id: ''
       })
 
+      const handleChange=e=>{
+        const {name, value}=e.target;
+        setUsuarioSeleccionado(prevState=>({
+          ...prevState,
+          [name]: value
+        }));
+      }
+
 
     const abrirCerrarModalEditar = (rowData = '') => {
         if(rowData != '') {
@@ -146,7 +159,7 @@ async function getUsers() {
             setUsuarioSeleccionado({
                 name: rowData.name,
                 email: rowData.email, 
-                id: rowData.name
+                id: rowData.id
               });
             // alert(rowData.tableData.id);
             document.getElementsByName('nombre').value = rowData.tableData.id; 
@@ -160,7 +173,7 @@ async function getUsers() {
     const bodyEditar=(
         <div className={styles.modal}>
           <h3>Editar usuario</h3>
-        <TextField id="NombreEditar" className={styles.inputMaterial} label="Nombre completo" name="nombre" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.name}/>
+        <TextField id="NombreEditar" className={styles.inputMaterial} label="Nombre completo" name="name" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.name}/>
           <br /><br />
           <div align="right">
             <Button color="primary" onClick={()=>actualizarUsuario({usuarioSeleccionado})}>Editar</Button>
@@ -177,7 +190,7 @@ async function getUsers() {
     ];
 
     useEffect(()=>{
-        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users')
+        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users')
         .then(resp=>resp.json())
         .then(resp=>{
             // console.log(resp)

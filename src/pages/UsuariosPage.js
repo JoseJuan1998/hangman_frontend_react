@@ -18,19 +18,24 @@ async function registrarUsuario() {
   let regName = document.getElementById('regName').value;
   let regEmail = document.getElementById('regEmail').value;
  
+  // let reqData = {
+  //  "name": regName, 
+  //  "credential": {
+  //    "email": regEmail, 
+  //    "password": "DummyPassword321", 
+  //    "password_confirmation": "DummyPassword321",
+  //    "admin": false, 
+  //    "active": "false"
+  //  }
+  //}
+
   let reqData = {
-    "name": regName, 
-    "credential": {
-      "email": regEmail, 
-      "password": "DummyPassword321", 
-      "password_confirmation": "DummyPassword321",
-      "admin": false, 
-      "active": "false"
-    }
+    "name": regName,
+    "email": regEmail
   }
   
   console.log(reqData);
-  const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/api/users', reqData);
+  const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users', reqData);
   console.log(response.data);
   window.location.reload(false);
 } //registrarUsuario()

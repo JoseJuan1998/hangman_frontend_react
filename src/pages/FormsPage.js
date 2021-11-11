@@ -31,6 +31,7 @@ class FormsPage extends Component {
     const { modal } = this.state;
 
     return (
+      
       <MDBContainer className='mt-5'>
         <DocsLink
           title='Forms'
