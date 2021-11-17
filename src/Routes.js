@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState} from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import NavigationNavPage from './pages/NavigationNavPage';
@@ -63,23 +64,31 @@ import InputGroupPage from './pages/InputGroupPage';
 import TreeviewPage from './pages/TreeviewPage';
 import RatingPage from './pages/RatingPage';
 import LoginPage from './pages/LoginPage';
+import PasswordPage from './pages/PasswordPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
+function Routes() {
 
-class Routes extends React.Component {
-  render() {
+    // State que maneja la proteccion de la ruta
+    const [isAuth, setIsAuth] = useState(true);
+  
     return (
       <Switch>
         <Route exact path='/' component={HomePage} />
         <Route exact path='/addons' component={AddonsNavPage} />
         <Route exact path='/advanced' component={AdvancedNavPage} />
-        <Route exact path='/palabras' component={PalabrasPage} />
+
+        {/* Protected routes */}
+        <ProtectedRoute exact path='/palabras' component={PalabrasPage} isAuth={isAuth} />
+        
         <Route exact path='/usuarios' component={UsuariosPage} />
         <Route exact path='/forms' component={FormsNavPage} />
         <Route exact path='/modals' component={ModalsNavPage} />
         <Route exact path='/navigation' component={NavigationNavPage} />
         <Route exact path='/tables' component={TablesNavPage} />
         <Route exact path='/login' component={LoginPage} />
+        <Route exact path='/password' component={PasswordPage} />
         {/* FREE */}
         <Route path='/addons/iframe' component={IframePage} />
         <Route path='/addons/edge-header' component={EdgeHeaderPage} />
@@ -140,7 +149,5 @@ class Routes extends React.Component {
         />
       </Switch>
     );
-  }
 }
-
 export default Routes;
