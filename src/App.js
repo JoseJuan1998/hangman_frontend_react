@@ -18,15 +18,36 @@ import AdminNavbar from './pages/AdminNavbar';
 import CapturadorNavbar from './pages/CapturadorNavbar';
 import UserNavbar from './pages/UserNavbar';
 
+// 1 = Admin, 2 = Capturador, 3 = User
+function getCurrentUser() {
+  console.log('Local storage: ' + localStorage.getItem('userType'));
+  // return 2;
+  return localStorage.getItem('userType');
+}
 
 class App extends Component {
 
 
   render() {
 
+    
+    let navbar;
+    let permissions = getCurrentUser();
+    if(permissions == 1) {
+      navbar = <AdminNavbar />;
+    } else if(permissions == 2) {
+      navbar = <CapturadorNavbar />;
+    } else  {
+      navbar = <UserNavbar />;
+    }
 
     return (
-      <AdminNavbar />
+
+      <div>{navbar}</div>    
+      
+      // <AdminNavbar />
+      // <CapturadorNavbar />
+      // <UserNavbar />
     );
   }
 }

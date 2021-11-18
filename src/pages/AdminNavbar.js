@@ -20,12 +20,14 @@ async function logout() {
   const response = await axios.delete('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/logout')
   .then(resp=>{
     console.log(resp.data);
+    window.location.replace('/');
   })  
   .catch(error=>{
     alert(error.response.data.error);
     console.log(error.response);
   });
   console.log(response);
+  localStorage.removeItem("userType");
 } // logout()
 
 

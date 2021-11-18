@@ -13,6 +13,30 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
+async function getUserInfo(id) {
+        let respData;
+        // Si existe usuario, obtenemos sus datos
+        const response = axios.get('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + id)
+        .then(resp=>{
+          console.log('second request');          
+          respData = resp.data.user;
+          console.log(resp.data.user);
+
+          // A cambiar... Evaluamos si es admin o no
+          if(resp.data.user.admin) {
+            localStorage.setItem("userType", 1);
+          } else {
+            localStorage.setItem("userType", 3);
+          }
+          window.location.replace('/');
+        })  
+        .catch(error=>{
+          alert(error.response.data.error);
+          console.log(error.response);
+        });
+        return respData;
+} // getUserInfo()
+
 async function login() {
   let email = document.getElementById('loginEmail').value;
   let password = document.getElementById('loginPassword').value;
@@ -31,7 +55,15 @@ async function login() {
       const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/login', reqData)
       .then(resp=>{
         console.log(resp.data);
-        alert(resp.data.user_id);
+        let userId = resp.data.user_id;
+        // alert(userId);
+
+        let userInfo = getUserInfo(userId);
+        console.log('userInfo: ');
+        console.log(userInfo);
+
+        // window.location.replace('/');
+
       })  
       .catch(error=>{
         if(error.response) {          
@@ -88,9 +120,8 @@ return (
                 <br />
                 <input type="password" placeholder="Contraseña" id="loginPassword" className="form-control" />
                 <div className="text-center mt-4">
-                  <MDBBtn color="red" onClick={login}>Ingresar</MDBBtn>  
-                  <MDBBtn color="red" onClick={tempLogout}>Logout</MDBBtn>                  
-                  <p style={{ marginTop: '1rem' }}><a href="#">¿No recuerdas tu contraseña?</a></p>            
+                  <MDBBtn color="red" onClick={login}>Ingresar</MDBBtn>                    
+                  <p style={{ marginTop: '1rem' }}><a href="/remember">¿No recuerdas tu contraseña?</a></p>            
                 </div>
               </form>
 

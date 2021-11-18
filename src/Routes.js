@@ -65,6 +65,7 @@ import TreeviewPage from './pages/TreeviewPage';
 import RatingPage from './pages/RatingPage';
 import LoginPage from './pages/LoginPage';
 import PasswordPage from './pages/PasswordPage';
+import RememberPasswordPage from './pages/RememberPasswordPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 
@@ -89,6 +90,7 @@ function Routes() {
         <Route exact path='/tables' component={TablesNavPage} />
         <Route exact path='/login' component={LoginPage} />
         <Route exact path='/password' component={PasswordPage} />
+        <Route exact path='/remember' component={RememberPasswordPage} />
         {/* FREE */}
         <Route path='/addons/iframe' component={IframePage} />
         <Route path='/addons/edge-header' component={EdgeHeaderPage} />
