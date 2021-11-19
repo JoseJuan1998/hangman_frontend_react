@@ -13,6 +13,15 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
+
+function validateUser() {       
+  let permissions = localStorage.getItem('userType');
+  if(permissions == 1 || permissions == 2) {
+    window.location.replace('/');
+  }    
+}
+
+
 async function getUserInfo(id) {
         let respData;
         // Si existe usuario, obtenemos sus datos
@@ -25,6 +34,8 @@ async function getUserInfo(id) {
           // A cambiar... Evaluamos si es admin o no
           if(resp.data.user.admin) {
             localStorage.setItem("userType", 1);
+          } else if(resp.data.user.active) {
+            localStorage.setItem("userType", 2);
           } else {
             localStorage.setItem("userType", 3);
           }
@@ -44,8 +55,7 @@ async function login() {
   
   if(email.length > 0 && password.length > 0) {
     document.getElementById('loginPassword').value = '';
-    if(validateEmail(email)) {
-      // alert('haciendo login de ' + email + ' y ' + password);  
+    if(validateEmail(email)) { 
       document.getElementById("loadingLogo").style.display = 'flex';
 
       let reqData = {
@@ -61,8 +71,6 @@ async function login() {
         let userInfo = getUserInfo(userId);
         console.log('userInfo: ');
         console.log(userInfo);
-
-        // window.location.replace('/');
 
       })  
       .catch(error=>{
@@ -96,6 +104,7 @@ async function tempLogout() {
 } // logout()
 
 const LoginPage = () => {
+validateUser();
 return (
 <MDBAnimation type='fadeIn' duration='500ms'>
   <MDBContainer>  

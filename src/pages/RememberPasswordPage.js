@@ -6,6 +6,15 @@ import Routes from "../Routes";
 import axios from 'axios';
 import loading from '../assets/loading.gif'
 
+
+function validateUser() {       
+    let permissions = localStorage.getItem('userType');
+    if(permissions == 1 || permissions == 2) {
+      window.location.replace('/');
+    }    
+  }
+
+
 function redirect() {
     window.location.replace('/');
 }
@@ -62,6 +71,7 @@ async function tempLogout() {
 } // logout()
 
 const RememberPasswordPage = () => {
+validateUser();
 return (
 <MDBAnimation type='fadeIn' duration='500ms'>
   <MDBContainer>  

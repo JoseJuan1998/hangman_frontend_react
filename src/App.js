@@ -21,7 +21,6 @@ import UserNavbar from './pages/UserNavbar';
 // 1 = Admin, 2 = Capturador, 3 = User
 function getCurrentUser() {
   console.log('Local storage: ' + localStorage.getItem('userType'));
-  // return 2;
   return localStorage.getItem('userType');
 }
 

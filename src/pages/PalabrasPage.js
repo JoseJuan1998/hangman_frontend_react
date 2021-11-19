@@ -12,7 +12,17 @@ import {
 import MenuLink from '../components/menuLink';
 import MyWordsPage from '../pages/MyWordsPage';
 
+
+function validateUser() {       
+  let permissions = localStorage.getItem('userType');
+  if(permissions != 1 && permissions != 2) {
+    window.location.replace('/');
+  }    
+}
+
+
 const CSSPage = () => {
+  validateUser();
   return (
     <>
     { /*<MDBEdgeHeader color='indigo darken-3' className='sectionPage' />*/ }

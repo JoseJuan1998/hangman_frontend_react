@@ -19,6 +19,13 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
+function validateUser() {       
+       let permissions = localStorage.getItem('userType');
+       if(permissions != 1) {
+         window.location.replace('/');
+       }    
+}
+        
 
 async function registrarUsuario() {
   document.getElementById('errorNotification').innerHTML = '';
@@ -57,6 +64,7 @@ async function registrarUsuario() {
 } //registrarUsuario()
 
 const CSSPage = () => {
+  validateUser();
   return (
     <>
     { /*<MDBEdgeHeader color='indigo darken-3' className='sectionPage' />*/ }

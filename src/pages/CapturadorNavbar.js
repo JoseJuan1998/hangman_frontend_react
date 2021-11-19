@@ -20,7 +20,7 @@ async function logout() {
   const response = await axios.delete('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/logout')
   .then(resp=>{
     console.log(resp.data);
-    window.location.replace('/');
+    window.location.replace('/login');
   })  
   .catch(error=>{
     alert(error.response.data.error);
