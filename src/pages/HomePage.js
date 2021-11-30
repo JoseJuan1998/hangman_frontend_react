@@ -34,6 +34,7 @@ class HomePage extends React.Component {
   startGame() {
     return function() {
       alert('Starting game ' + localStorage.getItem("game") + ' with difficulty: ' + localStorage.getItem("difficulty"));
+      window.location.replace('/hangman'); 
     }
   }; 
 

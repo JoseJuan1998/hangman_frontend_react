@@ -66,6 +66,7 @@ import RatingPage from './pages/RatingPage';
 import LoginPage from './pages/LoginPage';
 import PasswordPage from './pages/PasswordPage';
 import RememberPasswordPage from './pages/RememberPasswordPage';
+import GamePage from './pages/GamePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 
@@ -91,6 +92,7 @@ function Routes() {
         <Route exact path='/login' component={LoginPage} />
         <Route exact path='/password' component={PasswordPage} />
         <Route exact path='/remember' component={RememberPasswordPage} />
+        <Route exact path='/hangman' component={GamePage} />
         {/* FREE */}
         <Route path='/addons/iframe' component={IframePage} />
         <Route path='/addons/edge-header' component={EdgeHeaderPage} />
