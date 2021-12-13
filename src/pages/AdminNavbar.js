@@ -23,11 +23,14 @@ async function logout() {
     window.location.replace('/login');
   })  
   .catch(error=>{
-    alert(error.response.data.error);
+    
+    alert('Ha ocurrido un error al comunicarse con el servidor');
     console.log(error.response);
   });
   console.log(response);
   localStorage.removeItem("userType");
+  localStorage.removeItem('TOKEN_AUTH');
+  localStorage.removeItem('USER_NAME');
 } // logout()
 
 
@@ -62,6 +65,11 @@ class AdminNavbar extends Component {
       <Router>
         <div className='flyout'>
           <MDBNavbar color='#ef5350 red lighten-1' dark expand='md' fixed='top' scrolling>
+          
+            <MDBNavbarBrand className='py-0 font-weight-bold'>
+              {/* <Logo style={{ height: '2.5rem', width: '2.5rem' }} />*/ }                
+              <strong>¡Hola, {localStorage.getItem('USER_NAME')}!</strong>              
+            </MDBNavbarBrand>
 
             <MDBNavbarToggler
               onClick={this.toggleCollapse('mainNavbarCollapse')}

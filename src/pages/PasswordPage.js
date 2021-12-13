@@ -6,10 +6,14 @@ import loading from '../assets/loading.gif'
 function validateUser() {
   const queryParams = new URLSearchParams(window.location.search);
   const id = queryParams.get('id');
+  const token = queryParams.get('token');
+  localStorage.setItem('REMEMBER_PASSWORD_TOKEN', token);
   console.log(id);
-
-  if(id == null) {
-    window.location.replace('/');
+  let permissions = localStorage.getItem('userType');
+  if(id && id != null && token && token != null  && permissions == null ) {
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -54,13 +58,17 @@ async function crearContrasena() {
             "password": password2
           }
 
+          const config = {
+            headers: { Authorization: localStorage.getItem('REMEMBER_PASSWORD_TOKEN') }
+          };
+
           document.getElementById('loadingLogo').style.display = 'flex';
-          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData)
+          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData, config)
           .then(resp=>{
             console.log(resp.data);
             let userId = resp.data.user_id;
             // alert(userId);
-      
+
             document.getElementById('aceptar').style.display = 'inline';
             document.getElementById('loadingLogo').style.display = 'none';
             document.getElementById('password1').style.display = 'none';
@@ -70,14 +78,18 @@ async function crearContrasena() {
             document.getElementById('errorNotification').style.fontWeight = 'normal';
             document.getElementById('errorNotification').innerHTML = 'La contraseña ha sido cambiada exitosamente. Ya puede iniciar sesión.';
             
-            
-            
-            // window.location.replace('/');    
+             
           })
           .catch(error=>{
-            if(error.response) {          
-              document.getElementById('errorNotification').innerHTML = error.response.data.error;
-            }                  
+            document.getElementById('aceptar').style.display = 'inline';
+            document.getElementById('loadingLogo').style.display = 'none';
+            document.getElementById('password1').style.display = 'none';
+            document.getElementById('password2').style.display = 'none';
+            document.getElementById('crearPassword').style.display = 'none';            
+            document.getElementById('errorNotification').style.color = 'red';
+            document.getElementById('errorNotification').style.fontWeight = 'normal';
+            document.getElementById('errorNotification').innerHTML = 'Sucedió un error al cambiar la contraseña. Inténtelo más tarde.';
+                              
             console.log(error);
           }); 
 
@@ -100,44 +112,47 @@ function initFunction() {
 }
 
 const PasswordPage = () => {
-validateUser();
-return (
-<MDBAnimation type='fadeIn' duration='500ms'>
-  <MDBContainer>  
-    <MDBRow>
-      <MDBCol>
+if(validateUser()) { 
+  return (
+    <MDBAnimation type='fadeIn' duration='500ms'>
+      <MDBContainer>  
+        <MDBRow>
+          <MDBCol>
+    
+            <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '70vh'}}>  
+              <MDBCard style={{ width: "22rem" }}>
+                <MDBCardBody>
+    
+            
+    
+                  <form>
+                    <p className="h4 text-center mb-4">Crear contraseña</p>
+                      <MDBCol id="loadingLogo" style={{marginBottom: 20, display: 'none',  justifyContent:'center', alignItems:'center'}}>
+                            <img src={loading} alt="loading..." />
+                      </MDBCol>    
+                    <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold"  }}></p>
+                    <input type="password" placeholder="Contraseña" id="password1" className="form-control" />
+                    <br />
+                    <input type="password" placeholder="Repita su contraseña" id="password2" className="form-control" />
+                    <div className="text-center mt-4">
+                      <MDBBtn id="crearPassword" color="red" onClick={crearContrasena}>Crear contraseña</MDBBtn>                    
+                      <MDBBtn id="aceptar" color="red" style={{display:'none'}} onClick={redirect}>ACeptar</MDBBtn>                         
+                    </div>
+                  </form>
+    
+              </MDBCardBody>
+              </MDBCard>
+            </div>    
+          </MDBCol>
+        </MDBRow>
+      </MDBContainer>
+    </MDBAnimation>    
+    
+    ); // return component
+} else {
+  window.location.replace('/palabras');
+}
 
-        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '70vh'}}>  
-          <MDBCard style={{ width: "22rem" }}>
-            <MDBCardBody>
-
-        
-
-              <form>
-                <p className="h4 text-center mb-4">Crear contraseña</p>
-                  <MDBCol id="loadingLogo" style={{marginBottom: 20, display: 'none',  justifyContent:'center', alignItems:'center'}}>
-                        <img src={loading} alt="loading..." />
-                  </MDBCol>    
-                <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold"  }}></p>
-                <input type="password" placeholder="Contraseña" id="password1" className="form-control" />
-                <br />
-                <input type="password" placeholder="Repita su contraseña" id="password2" className="form-control" />
-                <div className="text-center mt-4">
-                  <MDBBtn id="crearPassword" color="red" onClick={crearContrasena}>Crear contraseña</MDBBtn>                    
-                  <MDBBtn id="aceptar" color="red" style={{display:'none'}} onClick={redirect}>ACeptar</MDBBtn>                         
-                </div>
-              </form>
-
-          </MDBCardBody>
-          </MDBCard>
-        </div>    
-      </MDBCol>
-    </MDBRow>
-  </MDBContainer>
-</MDBAnimation>
-
-
-);
 };
 
 export default PasswordPage;

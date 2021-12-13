@@ -22,49 +22,74 @@ function validateEmail(email) {
 function validateUser() {       
        let permissions = localStorage.getItem('userType');
        if(permissions != 1) {
-         window.location.replace('/');
-       }    
+         return false;
+       } else {
+         return true;
+       }
 }
         
 
-async function registrarUsuario() {
+async function registrarUsuario(validacion) {
+  if (event.key === 'Enter' || validacion === true) {
+
+
   document.getElementById('errorNotification').innerHTML = '';
   let regName = document.getElementById('regName').value;
+  let regLastname = document.getElementById('regLastname').value;
   let regEmail = document.getElementById('regEmail').value;
- 
-  if(regName.length > 0 && regEmail.length > 0) {
-
+  if(regName.length > 0 && regEmail.length > 0 && regLastname.length > 0) {
     if(validateEmail(regEmail)) {
         let reqData = {
           "name": regName,
+          "lastname": regLastname,
           "email": regEmail
         }  
         console.log(reqData);
-        const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users', reqData)
+        const config = {
+          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+        };
+        const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users', reqData, config)
         .then(resp=>{
           console.log(resp.data);          
           window.location.reload(false);
         })  
         .catch(error=>{
-          if(error.response) {          
-            document.getElementById('errorNotification').innerHTML = error.response.data.email;
-          }                  
-          console.log(error);
+          if(error.response) {
+            let mensaje;
+            if(error.response.data.credential.email) {
+              mensaje = error.response.data.credential.email[0];
+            }                        
+            let notificacion = 'Ha sucedido un error, por favor inténtelo más tarde';
+            if(mensaje == 'Email already exist') {
+              notificacion = 'El correo electrónico del usuario ya ha sido registrado';
+            }           
+          document.getElementById('errorNotification').innerHTML = notificacion;                            
+          }             
+          console.log(error.response.data.credential.email);
         });
-
     } else {
         document.getElementById('errorNotification').innerHTML = 'Ingrese un correo electrónico correcto';
-    }
-    
-
+    }    
   } else {
     document.getElementById('errorNotification').innerHTML = 'Complete todos los campos antes de continuar';
   }
 
+  } // if event.key = enter
 } //registrarUsuario()
 
+
+function registrarUsuarioClick() {
+  registrarUsuario(true);
+}
+
+
 const CSSPage = () => {
-  validateUser();
+  if(!validateUser()) {
+    window.location.replace('/');
+  } else {
+
+  
+  
   return (
     <>
     { /*<MDBEdgeHeader color='indigo darken-3' className='sectionPage' />*/ }
@@ -78,19 +103,19 @@ const CSSPage = () => {
               <br /> <MyDatatablePage />
             </MDBCol>
 
-            <MDBCol size="3">
-            <br />
+            <MDBCol size="3" style={{ paddingTop: 20 }}>            
                 <MDBJumbotron className='mt-3'>
                   <h4 className='text-center'>Registrar usuario</h4><br />
                   <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold", fontSize: 15  }}></p> 
-                  <form>
-                  <input id="regName" type="text" placeholder="Nombre completo" className="form-control" />
+                  
+                  <input onKeyDown={registrarUsuario} id="regName" type="text" placeholder="Nombre(s)" className="form-control" />
+                  <br /><input onKeyDown={registrarUsuario} id="regLastname" type="text" placeholder="Apellidos" className="form-control" />
                   <br />
-                  <input id="regEmail" type="email" placeholder="Correo electrónico" className="form-control" />
+                  <input onKeyDown={registrarUsuario} id="regEmail" type="email" placeholder="Correo electrónico" className="form-control" />
                   <div className="text-center mt-4">
-                    <MDBBtn onClick={registrarUsuario} color="indigo">Registrar usuario</MDBBtn>
+                    <MDBBtn onClick={registrarUsuarioClick} color="indigo">Registrar</MDBBtn>
                   </div>
-                </form>
+                
                 </MDBJumbotron>
             </MDBCol>
           
@@ -100,7 +125,8 @@ const CSSPage = () => {
         </MDBContainer>
       </MDBAnimation>
     </>
-  );
+   );
+  }
 };
 
 export default CSSPage;

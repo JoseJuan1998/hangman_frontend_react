@@ -14,6 +14,7 @@ import image5 from '../assets/ahorcado/5.JPG' // vidas restantes: 4/6
 import image6 from '../assets/ahorcado/6.JPG' // vidas restantes: 5/6
 import image7 from '../assets/ahorcado/7.JPG' // vidas restantes: 6/6
 
+
 let PALABRA_JUEGO;
 let LETRAS_ENCONTRADAS = [];
 let PALABRA_OCULTA_ACTUAL;
@@ -36,9 +37,25 @@ function validateUser() {
     }    
   }
 
-function obtenerPalabra() {
-    let palabra = 'Edgar Huemac';
+  function recargarJuego() {
+    window.location.reload();
+  } // recargarJuego()
+
+  function salirDelJuego() {
+    window.location.replace('/');
+  } // salirDelJuego
+
+  async function obtenerPalabra() {
+    let palabra = await axios.get('http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word/' + localStorage.getItem("difficulty"));
+    console.log("Palabra ----------------");
+    // alert(palabra.data.word.word);
+    palabra = palabra.data.word.word;
+    //if(palabra.data.word.word) {
+    //  
+    //} 
     PALABRA_JUEGO = palabra;
+    console.log('PALABRA_JUEGO: ' + PALABRA_JUEGO);
+
     let palabraOculta = '';
     for(let i = 0; i < palabra.length; i++) {
         palabraOculta += '__ ';
@@ -47,6 +64,11 @@ function obtenerPalabra() {
     PALABRA_OCULTA_ACTUAL = palabraOculta;
     return palabraOculta;    
 } // obtenerPalabra()
+
+function finJuego() {
+  document.getElementById('jugarOtraVezBtn').style.display = 'inline';
+  document.getElementById('salirBtn').style.display = 'inline';
+}
 
 function actualizarVidas() {
   let vidasRestantes = 'Vidas restantes: ' + VIDAS_RESTANTES + '/6';
@@ -59,7 +81,8 @@ function actualizarVidas() {
     document.getElementById('letra').style.display = 'none';
     document.getElementById('notificacion').innerHTML = 'La respuesta correcta era: ' + PALABRA_JUEGO;
     document.getElementById('palabraActual').innerHTML = '¡Has perdido!';
-    
+    finJuego();
+      
   }
 }
 
@@ -68,12 +91,13 @@ function EvaluarJuegoGanado() {
     document.getElementById('evaluarLetraBtn').style.display = 'none';
     document.getElementById('letra').style.display = 'none';
     document.getElementById('notificacion').innerHTML = '¡Felicidades, has ganado!';
+    finJuego();
   }
 }
 
 function evaluarLetra(validacion) {
   if (event.key === 'Enter' || validacion == true) {
-    let letra = document.getElementById('letra').value;
+    let letra = document.getElementById('letra').value.toUpperCase();
     document.getElementById('letra').value = '';
     console.log(letra);
     console.log(PALABRA_JUEGO);
@@ -124,8 +148,28 @@ function validateGame() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    if(document.getElementById("palabraActual")) {
-        document.getElementById("palabraActual").innerHTML = obtenerPalabra();
+    if(document.getElementById("palabraActual")) {               
+        console.log('DOM Content Loaded event function');
+        let palabra;
+        let url; 
+        if(localStorage.getItem("difficulty") != 'RANDOM') {
+          url = 'http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word/' + localStorage.getItem("difficulty"); 
+        } else {
+          url = 'http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word'; 
+        }
+        const response = axios.get(url)
+        .then(resp=>{
+          palabra = resp.data.word.word; 
+          PALABRA_JUEGO = palabra;                 
+          let palabraOculta = '';
+          for(let i = 0; i < palabra.length; i++) {
+              palabraOculta += '__ ';
+          }
+          console.log(palabraOculta);
+          PALABRA_OCULTA_ACTUAL = palabraOculta;
+          document.getElementById("palabraActual").innerHTML = palabraOculta; 
+          document.getElementById("palabraActual").style.display = 'block'; 
+        })
         actualizarVidas();
     }    
     
@@ -158,7 +202,7 @@ if(validateGame()) {
                     
     
                     <div className="text-center">
-                        <p id="palabraActual" style={{ fontSize: 26, fontWeight: 'bold', color: 'red' }}>Hola</p>  
+                        <p id="palabraActual" style={{display: 'none', fontSize: 26, fontWeight: 'bold', color: 'red' }}>Hola</p>  
                         <p id="notificacion" style={{ fontSize: 20, fontWeight: 'bold'}}></p>                      
                     </div>                
                     
@@ -167,8 +211,14 @@ if(validateGame()) {
                             <input onKeyDown={evaluarLetra} id="letra" style={{marginTop: 10}} type="text" placeholder="Escriba una letra" maxLength="1"  className="form-control" />                                        
                         </MDBCol>
                         <MDBCol size="5">
-                            <MDBBtn type="button" id="evaluarLetraBtn" color="red" onClick={clicEvaluarLetra}>Probar letra</MDBBtn>
+                            <MDBBtn type="button" id="evaluarLetraBtn" color="red" onClick={clicEvaluarLetra}>Probar letra</MDBBtn>                            
                         </MDBCol>
+
+                        <MDBCol className="text-center">
+                          <MDBBtn type="button" id="jugarOtraVezBtn"  style={{ display: 'none' }} onClick={recargarJuego} color="red">Jugar de nuevo</MDBBtn>
+                          <MDBBtn type="button" id="salirBtn" style={{ display: 'none' }} onClick={salirDelJuego}  outline color="danger" >Salir</MDBBtn>
+                        </MDBCol>
+
                     </MDBRow>
     
                     <br />
@@ -194,5 +244,5 @@ if(validateGame()) {
 };
 
 
-obtenerPalabra();
+// obtenerPalabra();
 export default GamePage;

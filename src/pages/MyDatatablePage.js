@@ -62,7 +62,7 @@ async function getUsers() {
     let myUsers = [];
         const response = await axios({
             method: 'get',
-            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users'
+            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/1/100'
         });
         for(let i = 0; i < response.data.users.length; i++) {
             myUsers.push({
@@ -80,11 +80,20 @@ async function getUsers() {
     let userToDelete = rowData.id;
     // alert('eliminando a ' + userToDelete);
     console.log(userToDelete)
+    const config = {
+      headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+    };
 
-    const response = await axios({
-        method: 'delete',
-        url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete
-    });
+    // const response = await axios({
+    //     method: 'delete',
+    //     url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete
+    // });
+
+    const response = await axios.delete(
+        'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete, 
+        config
+    );
+
     window.location.reload(false);
  } // eliminarUsuario()
 
@@ -93,16 +102,20 @@ async function getUsers() {
     console.log(usuario.usuarioSeleccionado.name);
     // alert('Actualizando usuario' + usuario.usuarioSeleccionado.name + ' con el id ' + usuario.usuarioSeleccionado.id + 'a ' + document.getElementById('NombreEditar').value);
     console.log(usuario.usuarioSeleccionado);
-    // axios put here...
+      let reqData = {
+        "name":  document.getElementById('NombreEditar').value, 
+        "lastname":  document.getElementById('ApellidoEditar').value, 
+      };
+      const config = {
+        headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+      };
 
-    let reqData = {
-        "name":  document.getElementById('NombreEditar').value
-      }
-    const response = await axios.put(
+      const response = await axios.put(
         'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/name/' + usuario.usuarioSeleccionado.id, 
-        reqData
-        );
-        window.location.reload(false);
+        reqData, config);
+      // console.log(reqData);
+      // console.log(usuario.usuarioSeleccionado.id);
+      window.location.reload(false);
  } // actualizarUsuario()
 
 
@@ -128,18 +141,12 @@ async function getUsers() {
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
       };
 
-    // const emptyList = [
-        //     { active: 'Activa', name: 'Edgar Huemac Sanchez', email: 'edgar@gmail.com' }, 
-        //     { active: 'No activa', name: 'Maria Fernanda Morales', email: 'mafer@gmail.com' }, 
-        //     { active: 'Activa', name: 'Rodrigo Alejandro Quintana', email: 'roy12@outlook.com' }, 
-        //     { active: 'Activa', name: 'Alan Martin Fuentes', email: 'alanfp@outlook.com' }, 
-        // ];
-
     // State that manages the datatable's data
     const [data, setData] = useState([]);
     const [modalEditar, setModalEditar] = useState(false);
     const [usuarioSeleccionado, setUsuarioSeleccionado]=useState({
         name: '',
+        lastname: '',
         email: '', 
         id: ''
       })
@@ -158,11 +165,14 @@ async function getUsers() {
             console.log(rowData);
             setUsuarioSeleccionado({
                 name: rowData.name,
+                lastname: rowData.lastname,
                 email: rowData.email, 
                 id: rowData.id
               });
-            // alert(rowData.tableData.id);
-            document.getElementsByName('nombre').value = rowData.tableData.id; 
+            if(rowData.tableData) {
+              // alert(rowData.tableData.id);
+              document.getElementsByName('nombre').value = rowData.tableData.id; 
+            }               
         }
             
         
@@ -173,7 +183,8 @@ async function getUsers() {
     const bodyEditar=(
         <div className={styles.modal}>
           <h3>Editar usuario</h3>
-        <TextField id="NombreEditar" className={styles.inputMaterial} label="Nombre completo" name="name" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.name}/>
+        <TextField id="NombreEditar" className={styles.inputMaterial} label="Nombre(s)" name="name" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.name}/>
+        <TextField id="ApellidoEditar" className={styles.inputMaterial} label="Apellidos" name="lastname" onChange={handleChange} value={usuarioSeleccionado&&usuarioSeleccionado.lastname}/>
           <br /><br />
           <div align="right">
             <Button color="primary" onClick={()=>actualizarUsuario({usuarioSeleccionado})}>Editar</Button>
@@ -186,18 +197,34 @@ async function getUsers() {
     const columns = [
         { title: 'Estatus', field: 'active' },
         { title: 'Nombre', field: 'name' },
+        { title: 'Apellidos', field: 'lastname' },
         { title: 'Correo electónico', field: 'email' }
     ];
 
     useEffect(()=>{
-        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users')
+        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/1/100', {
+          headers: new Headers({
+            'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+          }), 
+        })
         .then(resp=>resp.json())
         .then(resp=>{
-            // console.log(resp)
-            setData(resp.users)
+            console.log(resp)
             listaUsuarios = resp.users;
-            console.log(listaUsuarios);
+            for(let x = 0; x < resp.users.length; x++) {
+              if(resp.users[x].active ) {
+                resp.users[x].active = "Activa";
+              } else {
+                resp.users[x].active = "Bloqueada"; 
+              }              
+            }
+            // console.log(listaUsuarios);
+            setData(resp.users)            
         })
+        .catch(error=>{
+          alert('No ha sido posible comunicarse con el servidor. Inténtelo más tarde.');
+          console.log(error.response);
+        });
     },[])
 
     return(
@@ -205,7 +232,35 @@ async function getUsers() {
             <MaterialTable 
                 icons={tableIcons}
                 columns={columns}
-                data={data}   
+                options={{debounceInterval: 700}}
+                
+                
+                data={data}                                 /* Without server-side pagination */ 
+
+                                
+                //data={query=>                            /* With server-side pagination */
+                //  new Promise((resolve, reject) => {
+                //    // Prepare data and call the resolve like this
+                //    let url = "http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users"; // .../n_pagina/n_registrosDeLaPagina         
+                //    url += "/" + (query.page + 1);
+                //    url += "/" + query.pageSize; 
+                //    fetch(url, {
+                //      headers: new Headers({
+                //        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                //      }),
+                //    }).then(resp=>resp.json()).then(resp=>{
+                //      console.log(resp);
+                //      console.log(resp.users);
+                //      resolve({
+                //        data: resp.users,
+                //        page: query.page,
+                //        totalCount: resp.count
+                //      });
+                //    })
+                //  })
+                //}    
+
+
                 title='Usuarios registrados'
                 actions={[
                     {
@@ -221,7 +276,26 @@ async function getUsers() {
                         onClick: (event, rowData) => 
                         eliminarUsuario(rowData)
                     },                    
-                ]}             
+                ]}   
+                localization={{
+                  pagination: {
+                      labelDisplayedRows: '{from}-{to} de {count}',
+                      labelRowsSelect: 'usuarios'
+                  },
+                  toolbar: {
+                      nRowsSelected: '{0} usuario(s) seleccionado(s)', 
+                      searchPlaceholder: 'Buscar'
+                  },
+                  header: {
+                      actions: 'Acciones'
+                  },
+                  body: {
+                      emptyDataSourceMessage: 'No hay usuarios para mostrar',
+                      filterRow: {
+                          filterTooltip: 'Filtrar'
+                      }
+                  }
+              }}           
             />
 
 

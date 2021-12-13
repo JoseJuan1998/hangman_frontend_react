@@ -33,7 +33,7 @@ class HomePage extends React.Component {
 
   startGame() {
     return function() {
-      alert('Starting game ' + localStorage.getItem("game") + ' with difficulty: ' + localStorage.getItem("difficulty"));
+      // alert('Starting game ' + localStorage.getItem("game") + ' with difficulty: ' + localStorage.getItem("difficulty"));
       window.location.replace('/hangman'); 
     }
   }; 
@@ -101,10 +101,10 @@ class HomePage extends React.Component {
                   </div>
                   <div style={{ fontSize: 24, fontWeight: 'bold', paddingTop: 40 }}>
                     <p>Seleccione la dificultad</p>
-                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('facil') } id='facil' outline color="danger">Fácil</MDBBtn>
-                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('media') } id='media' outline color="danger">Media</MDBBtn>
-                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('dificil') } id='dificil' outline color="danger">Dificil</MDBBtn>
-                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('aleatoria') } id='aleatoria' outline color="danger">Aleatoria</MDBBtn>
+                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('EASY') } id='EASY' outline color="danger">Fácil</MDBBtn>
+                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('MEDIUM') } id='MEDIUM' outline color="danger">Media</MDBBtn>
+                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('HARD') } id='HARD' outline color="danger">Dificil</MDBBtn>
+                    <MDBBtn className="difficultyBtn" onClick={ this.setDifficulty('RANDOM') } id='RANDOM' outline color="danger">Aleatoria</MDBBtn>
                   </div>
                 </MDBCardBody>
               </MDBCol>

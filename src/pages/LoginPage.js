@@ -14,22 +14,29 @@ function validateEmail(email) {
 }
 
 
-function validateUser() {       
+function isLoggedIn() {       
   let permissions = localStorage.getItem('userType');
   if(permissions == 1 || permissions == 2) {
-    window.location.replace('/');
-  }    
+    return false;
+  } else {
+    return true;
+  }
 }
 
 
 async function getUserInfo(id) {
         let respData;
+        
         // Si existe usuario, obtenemos sus datos
-        const response = axios.get('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + id)
-        .then(resp=>{
+        const config = {
+          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+        };
+        const response = axios.get('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + id, config)
+        .then(resp=>{          
           console.log('second request');          
           respData = resp.data.user;
-          console.log(resp.data.user);
+          console.log(resp.data.user); 
+          localStorage.setItem('USER_NAME', resp.data.user.name);
 
           // A cambiar... Evaluamos si es admin o no
           if(resp.data.user.admin) {
@@ -39,16 +46,23 @@ async function getUserInfo(id) {
           } else {
             localStorage.setItem("userType", 3);
           }
-          window.location.replace('/');
+
+          window.location.replace('/palabras');
         })  
-        .catch(error=>{
+        .catch(error=>{          
           alert(error.response.data.error);
           console.log(error.response);
-        });
+        });        
         return respData;
 } // getUserInfo()
 
-async function login() {
+function loginClick() {
+  login(true);
+} // loginClick()
+
+async function login(validacion) {
+  if (event.key === 'Enter' || validacion == true) { 
+  
   let email = document.getElementById('loginEmail').value;
   let password = document.getElementById('loginPassword').value;
   document.getElementById('errorNotification').innerHTML = '';
@@ -64,8 +78,11 @@ async function login() {
       }
       const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/login', reqData)
       .then(resp=>{
-        console.log(resp.data);
+
+        console.log(resp.data); // request response's data
+
         let userId = resp.data.user_id;
+        localStorage.setItem('TOKEN_AUTH', resp.data.token_auth);
         // alert(userId);
 
         let userInfo = getUserInfo(userId);
@@ -75,20 +92,24 @@ async function login() {
       })  
       .catch(error=>{
         if(error.response) {          
-          document.getElementById('errorNotification').innerHTML = error.response.data.error;
+          let mensaje = error.response.data.error;
+          let notificacion = mensaje;
+          if(mensaje == 'Wrong password' || mensaje == 'User not found') {
+            notificacion = 'El correo o contraseña son incorrectos';
+          }
+          document.getElementById('errorNotification').innerHTML = notificacion;
         }                  
-        console.log(error);
+        console.log(error.response); // request response's data
       });
-      document.getElementById("loadingLogo").style.display = 'none';
-      
-      
 
+      document.getElementById("loadingLogo").style.display = 'none';
     } else {
       document.getElementById('errorNotification').innerHTML = 'Dirección de correo no válida';
     }
   } else  {
     document.getElementById('errorNotification').innerHTML = 'Complete los campos antes de continuar';
   }
+  } // if validacion == true or Enter
 } // login()
 
 async function tempLogout() {
@@ -104,44 +125,47 @@ async function tempLogout() {
 } // logout()
 
 const LoginPage = () => {
-validateUser();
-return (
-<MDBAnimation type='fadeIn' duration='500ms'>
-  <MDBContainer>  
-    <MDBRow>
-      <MDBCol>
+if(isLoggedIn()) {
+  return (
+    <MDBAnimation type='fadeIn' duration='500ms'>
+      <MDBContainer>  
+        <MDBRow>
+          <MDBCol>
+    
+            <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '70vh'}}>  
+              <MDBCard style={{ width: "22rem" }}>
+                <MDBCardBody>
+    
+                    <p className="h4 text-center mb-4">Iniciar sesión</p>
+                    <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold"  }}></p> 
+                   
+                    
+    
+                    
+                      <MDBCol id="loadingLogo" style={{marginBottom: 20, display: 'none',  justifyContent:'center', alignItems:'center'}}><img src={loading} alt="loading..." /></MDBCol>                  
+                    
+    
+                    <input onKeyPress={login} type="email" placeholder="Correo electrónico" id="loginEmail" className="form-control" />
+                    <br />
+                    <input onKeyPress={login} type="password" placeholder="Contraseña" id="loginPassword" className="form-control" />
+                    <div className="text-center mt-4">
+                      <MDBBtn color="red" onClick={loginClick}>Ingresar</MDBBtn>                    
+                      <p style={{ marginTop: '1rem' }}><a href="/remember">¿No recuerdas tu contraseña?</a></p>            
+                    </div>
+                  
+    
+              </MDBCardBody>
+              </MDBCard>
+            </div>    
+          </MDBCol>
+        </MDBRow>
+      </MDBContainer>
+    </MDBAnimation>
+    ); // return 
+} else {
+  window.location.replace('/palabras')
+}
 
-        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '70vh'}}>  
-          <MDBCard style={{ width: "22rem" }}>
-            <MDBCardBody>
-
-              <form>
-                <p className="h4 text-center mb-4">Iniciar sesión</p>
-                <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold"  }}></p> 
-               
-                
-
-                
-                  <MDBCol id="loadingLogo" style={{marginBottom: 20, display: 'none',  justifyContent:'center', alignItems:'center'}}><img src={loading} alt="loading..." /></MDBCol>                  
-                
-
-                <input type="email" placeholder="Correo electrónico" id="loginEmail" className="form-control" />
-                <br />
-                <input type="password" placeholder="Contraseña" id="loginPassword" className="form-control" />
-                <div className="text-center mt-4">
-                  <MDBBtn color="red" onClick={login}>Ingresar</MDBBtn>                    
-                  <p style={{ marginTop: '1rem' }}><a href="/remember">¿No recuerdas tu contraseña?</a></p>            
-                </div>
-              </form>
-
-          </MDBCardBody>
-          </MDBCard>
-        </div>    
-      </MDBCol>
-    </MDBRow>
-  </MDBContainer>
-</MDBAnimation>
-);
 };
 
 export default LoginPage;
