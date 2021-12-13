@@ -62,8 +62,9 @@ async function crearContrasena() {
             headers: { Authorization: localStorage.getItem('REMEMBER_PASSWORD_TOKEN') }
           };
 
+          // Pendiente: incluir headers de configuracion
           document.getElementById('loadingLogo').style.display = 'flex';
-          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData, config)
+          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData)
           .then(resp=>{
             console.log(resp.data);
             let userId = resp.data.user_id;
