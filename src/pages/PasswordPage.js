@@ -64,7 +64,7 @@ async function crearContrasena() {
 
           // Pendiente: incluir headers de configuracion
           document.getElementById('loadingLogo').style.display = 'flex';
-          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData)
+          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData, config)
           .then(resp=>{
             console.log(resp.data);
             let userId = resp.data.user_id;
