@@ -235,30 +235,46 @@ async function getUsers() {
                 options={{debounceInterval: 700}}
                 
                 
-                data={data}                                 /* Without server-side pagination */ 
+                // data={data}                                 /* Without server-side pagination */ 
 
                                 
-                //data={query=>                            /* With server-side pagination */
-                //  new Promise((resolve, reject) => {
-                //    // Prepare data and call the resolve like this
-                //    let url = "http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users"; // .../n_pagina/n_registrosDeLaPagina         
-                //    url += "/" + (query.page + 1);
-                //    url += "/" + query.pageSize; 
-                //    fetch(url, {
-                //      headers: new Headers({
-                //        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
-                //      }),
-                //    }).then(resp=>resp.json()).then(resp=>{
-                //      console.log(resp);
-                //      console.log(resp.users);
-                //      resolve({
-                //        data: resp.users,
-                //        page: query.page,
-                //        totalCount: resp.count
-                //      });
-                //    })
-                //  })
-                //}    
+                data={query=>                            /* With server-side pagination */
+                  new Promise((resolve, reject) => {
+                    // Prepare data and call the resolve like this
+                    let url = "http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users"; // .../n_pagina/n_registrosDeLaPagina         
+                    url += "/" + (query.page + 1);
+                    url += "/" + query.pageSize;
+                    url += '?'; 
+                    if(query.search) {
+                      url += `char=${query.search}`; 
+                      console.log(url);
+                    }
+                     
+                    if(query.orderBy) {
+                      url += `&field=${query.orderBy.field}&order=${query.orderDirection}`; 
+                    }
+                    fetch(url, {
+                      headers: new Headers({
+                        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                      }),
+                    }).then(resp=>resp.json()).then(resp=>{
+                       for(let x = 0; x < resp.users.length; x++) {
+                         if(resp.users[x].active ) {
+                           resp.users[x].active = "Activa";
+                         } else {
+                           resp.users[x].active = "Bloqueada"; 
+                         }              
+                       }
+                       console.log(resp);
+                      // console.log(resp.users.length);
+                      resolve({
+                        data: resp.users,
+                        page: query.page,
+                        totalCount: resp.count
+                      });
+                    })
+                  })
+                }    
 
 
                 title='Usuarios registrados'

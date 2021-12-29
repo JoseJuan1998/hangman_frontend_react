@@ -226,29 +226,40 @@ let listaPalabras = [];
                 options={{debounceInterval: 700, padding: 'dense'}}
                 
                 
-                data={data}                                 /* Without server-side pagination */ 
+                // data={data}                                 /* Without server-side pagination */ 
 
                                 
-                //data={query=>                                  /* With server-side pagination */
-                //  new Promise((resolve, reject) => {
-                //    // Prepare data and call the resolve like this
-                //    let url = "http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words"; // .../n_pagina/n_registrosDeLaPagina         
-                //    url += "/" + (query.page + 1);
-                //    url += "/" + query.pageSize; 
-                //    fetch(url, {
-                //      headers: new Headers({
-                //        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
-                //      }),
-                //    }).then(resp=>resp.json()).then(resp=>{
-                //      console.log(resp);
-                //      resolve({
-                //        data: resp.words,
-                //        page: query.page,
-                //        totalCount: resp.count
-                //      });
-                //    })
-                //  })
-                //}
+                data={query=>                                  /* With server-side pagination */
+                  new Promise((resolve, reject) => {
+                    // Prepare data and call the resolve like this
+                    let url = "http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words"; // .../n_pagina/n_registrosDeLaPagina         
+                    url += "/" + (query.page + 1);
+                    url += "/" + query.pageSize;
+                    url += '?'; 
+
+                    if(query.search) {
+                      url += `char=${query.search}`; 
+                      console.log(url);
+                    }
+
+                    if(query.orderBy) {
+                      url += `&field=${query.orderBy.field}&order=${query.orderDirection}`; 
+                    }
+
+                    fetch(url, {
+                      headers: new Headers({
+                        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                      }),
+                    }).then(resp=>resp.json()).then(resp=>{
+                      console.log(resp);
+                      resolve({
+                        data: resp.words,
+                        page: query.page,
+                        totalCount: resp.count
+                      });
+                    })
+                  })
+                }
 
                 title='Palabras registradas'
                 actions={[

@@ -95,6 +95,30 @@ function EvaluarJuegoGanado() {
   }
 }
 
+function filtrarLetra() {
+  console.log('evaluating ' + document.getElementById('letra').value); 
+  let valid = /^[a-zA-Z\s]*$/.test(document.getElementById('letra').value);
+  if(!valid) {
+    document.getElementById('letra').value = ''; 
+  }
+} // filtrarLetra()
+
+function evaluarAcentos() {
+
+}
+
+// Funcion que va a evaluar si existen acentos dentro de la letra, y cambiarlos por su contraparte. 
+function filtrarAcentos(letraMayuscula) {
+  switch(letraMayuscula) {  
+    case 'Á': letraMayuscula = 'A'; break; 
+    case 'É': letraMayuscula = 'E'; break; 
+    case 'Í': letraMayuscula = 'I'; break; 
+    case 'Ó': letraMayuscula = 'O'; break; 
+    case 'Ú': letraMayuscula = 'U'; break; 
+       
+  }
+} // filtrarAcentos()
+
 function evaluarLetra(validacion) {
   if (event.key === 'Enter' || validacion == true) {
     let letra = document.getElementById('letra').value.toUpperCase();
@@ -147,6 +171,17 @@ function validateGame() {
     }
 }
 
+function mapDifficulty(difficulty) {
+  let x; 
+  switch(difficulty) {
+    case 'HARD': x = 'DIFICIL'; break;
+    case 'MEDIUM': x = 'INTERMEDIO'; break;
+    case 'EASY': x = 'FACIL'; break;
+    default: window.location.replace('/');    
+  }
+  return x; 
+} // mapDifficulty()
+
 document.addEventListener("DOMContentLoaded", function() {
     if(document.getElementById("palabraActual")) {               
         console.log('DOM Content Loaded event function');
@@ -192,6 +227,7 @@ if(validateGame()) {
                 <MDBCardBody>
     
                     <p id="vidasRestantes" className="h4 text-center mb-4">Vidas restantes: 5/6</p>
+                    <p id="nivel" className="text-center mb-4" >Nivel: {mapDifficulty(localStorage.getItem("difficulty"))}</p>
                     <p id="errorNotification" style={{ color: 'red', textAlign: "center", fontWeight: "bold"  }}></p>                         
                     
                         <MDBCol id="currentImage" style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
@@ -208,7 +244,7 @@ if(validateGame()) {
                     
                     <MDBRow>
                         <MDBCol size="6">
-                            <input onKeyDown={evaluarLetra} id="letra" style={{marginTop: 10}} type="text" placeholder="Escriba una letra" maxLength="1"  className="form-control" />                                        
+                            <input onChange={filtrarLetra} onKeyDown={evaluarLetra} id="letra" style={{marginTop: 10}} type="text" placeholder="Escriba una letra" maxLength="1"  className="form-control" />                                        
                         </MDBCol>
                         <MDBCol size="5">
                             <MDBBtn type="button" id="evaluarLetraBtn" color="red" onClick={clicEvaluarLetra}>Probar letra</MDBBtn>                            
@@ -221,7 +257,6 @@ if(validateGame()) {
 
                     </MDBRow>
     
-                    <br />
                     <div className="text-center mt-4">
                                           
                     </div>

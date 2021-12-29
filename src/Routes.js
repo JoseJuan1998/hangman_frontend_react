@@ -16,6 +16,9 @@ import AlertPage from './pages/AlertPage';
 import HomePage from './pages/HomePage';
 import ButtonPage from './pages/ButtonPage';
 import UsuariosPage from './pages/UsuariosPage';
+import ReportesUsuariosPage from './pages/ReportesUsuariosPage';
+import ReportesPalabrasPage from './pages/ReportesPalabrasPage';
+
 import TablePage from './pages/TablePage';
 import TableResponsivePage from './pages/TableResponsivePage';
 import TableScrollPage from './pages/TableScrollPage';
@@ -85,6 +88,8 @@ function Routes() {
         <ProtectedRoute exact path='/palabras' component={PalabrasPage} isAuth={isAuth} />
         
         <Route exact path='/usuarios' component={UsuariosPage} />
+        <Route exact path='/reporte/usuarios' component={ReportesUsuariosPage} />
+        <Route exact path='/reporte/palabras' component={ReportesPalabrasPage} />
         <Route exact path='/forms' component={FormsNavPage} />
         <Route exact path='/modals' component={ModalsNavPage} />
         <Route exact path='/navigation' component={NavigationNavPage} />
