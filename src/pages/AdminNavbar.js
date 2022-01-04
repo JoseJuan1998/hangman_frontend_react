@@ -10,7 +10,11 @@ import {
   MDBNavLink,
   MDBTooltip,
   MDBIcon, 
-  MDBBtn
+  MDBBtn,
+  MDBDropdown,
+  MDBDropdownToggle,
+  MDBDropdownMenu,
+  MDBDropdownItem,
 } from 'mdbreact';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Routes from '../Routes';
@@ -78,6 +82,23 @@ class AdminNavbar extends Component {
               <MDBNavbarNav right>
 
                 <MDBNavItem>
+                   <MDBDropdown>
+                      <MDBDropdownToggle nav caret>
+                      <strong>Reportes</strong>
+                      </MDBDropdownToggle>
+                      <MDBDropdownMenu>
+                        <MDBDropdownItem href='/reporte/usuarios'>
+                          De usuarios
+                        </MDBDropdownItem>
+                        <MDBDropdownItem href='/reporte/palabras'>
+                          De palabras
+                        </MDBDropdownItem>
+                      </MDBDropdownMenu>
+                    </MDBDropdown>
+                 </MDBNavItem>
+
+
+                <MDBNavItem>
                   <MDBNavLink
                     onClick={this.closeCollapse('mainNavbarCollapse')}
                     to='/usuarios'
@@ -103,6 +124,8 @@ class AdminNavbar extends Component {
                     <strong>Logout</strong>
                   </MDBNavLink>
                 </MDBNavItem>
+
+
 
               </MDBNavbarNav>
             </MDBCollapse>

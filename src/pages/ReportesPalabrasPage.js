@@ -34,28 +34,78 @@ import { Modal, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import DatePickerPage from "./DatePickerPage";
 
-function descargarReporte() {
-  alert('Descargando reporte...');
+function setIntervaloJugada() {
+  console.log('updating');
+  if(document.getElementById('minJugada').value) {
+    localStorage.setItem('minJugada', document.getElementById('minJugada').value);
+  }
+  if(document.getElementById('maxJugada').value) {
+    localStorage.setItem('maxJugada', document.getElementById('maxJugada').value);
+  }
+  if(localStorage.getItem('minJugada') && localStorage.getItem('maxJugada')) {
+    window.location.reload(false);
+  }
+} // setIntervaloJugada()
+
+function setIntervaloAdivinada() {
+  console.log('updating');
+  if(document.getElementById('minAdivinada').value) {
+    localStorage.setItem('minAdivinada', document.getElementById('minAdivinada').value);
+  }
+  if(document.getElementById('maxAdivinada').value) {
+    localStorage.setItem('maxAdivinada', document.getElementById('maxAdivinada').value);
+  }
+  if(localStorage.getItem('minAdivinada') && localStorage.getItem('maxAdivinada')) {
+    window.location.reload(false);
+  }
+} // setIntervaloAdivinada()
+
+
+
+async function descargarReporte() {
+
+  axios({
+    url: 'http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/words/pdf', //your url
+    method: 'GET',
+    responseType: 'blob', // important
+    headers: {
+      Authorization: localStorage.getItem('TOKEN_AUTH')
+    }
+}).then((response) => {
+
+  var d = new Date();
+  d = new Date(d.getTime() - 3000000);
+  var date_format_str = d.getFullYear().toString()+"-"+((d.getMonth()+1).toString().length==2?(d.getMonth()+1).toString():"0"+(d.getMonth()+1).toString())+"-"+(d.getDate().toString().length==2?d.getDate().toString():"0"+d.getDate().toString())+" "+(d.getHours().toString().length==2?d.getHours().toString():"0"+d.getHours().toString())+":"+((parseInt(d.getMinutes()/5)*5).toString().length==2?(parseInt(d.getMinutes()/5)*5).toString():"0"+(parseInt(d.getMinutes()/5)*5).toString())+":00";
+  console.log(date_format_str);
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'words_report_' + date_format_str + '.pdf'); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+});
+
 } // descargarReporte()
 
 const originalData = [
   {
     word: "MANZANA",
     user: "edgarhuemac@gmail.com",
-    timesPlayed: 30, 
-    timesGuesed: 12
+    played: 30, 
+    guessed: 12
   }, 
   {
     word: "FUTBOL",
     user: "jeffstoever@gmail.com",
-    timesPlayed: 24, 
-    timesGuesed: 7
+    played: 24, 
+    guessed: 7
   }, 
   {
     word: "FUTBOLITO",
     user: "jeffstoever@gmail.com",
-    timesPlayed: 16, 
-    timesGuesed: 10
+    played: 16, 
+    guessed: 10
   }
 ];
 
@@ -63,14 +113,22 @@ const originalData = [
 export default function CustomEditComponent(props) {
 
   
+  const [value, setValue] = useState();
+
+  const refresh = ()=>{
+    console.log('refresh');
+    // window.location.reload();
+    // re-renders the component
+    setValue({});
+}
 
   const [data, setData] = useState(originalData);
 
   const tableColumns = [
     { title: "Palabra", field: "word" },
     { title: "Usuario propietario", field: "user" },
-    { title: "Veces jugada", field: "timesPlayed" },
-    { title: "Veces adivinada", field: "timesGuesed" },
+    { title: "Veces jugada", field: "played" },
+    { title: "Veces adivinada", field: "guessed" },
 
     /* {
       title: "Date",
@@ -115,19 +173,76 @@ export default function CustomEditComponent(props) {
       
       <br /><br />      
       <MDBContainer>
-      <input placeholder="Min. Jugada" id="minJugada" style={inputStyles} type="number"></input>      
-      <input placeholder="Max. Jugada" id="maxJugada" style={inputStyles} type="number"></input>
+      <input placeholder="Min. Jugada" id="minJugada" onChange={setIntervaloJugada} style={inputStyles} type="number"></input>      
+      <input placeholder="Max. Jugada" id="maxJugada" onChange={setIntervaloJugada} style={inputStyles} type="number"></input>
       <br />
-      <input placeholder="Min. Adivinada" id="minAdivinada" style={inputStyles} type="number"></input>      
-      <input placeholder="Max. Adivinada" id="maxAdivinada" style={inputStyles} type="number"></input>
+      <input placeholder="Min. Adivinada" id="minAdivinada" onChange={setIntervaloAdivinada} style={inputStyles} type="number"></input>      
+      <input placeholder="Max. Adivinada" id="maxAdivinada" onChange={setIntervaloAdivinada} style={inputStyles} type="number"></input>
 
       <div className="text-right">
         <MDBBtn color="red" onClick={descargarReporte}>Descargar reporte general</MDBBtn>
       </div>
       <MaterialTable
+        id='reportesPalabras'
         icons={tableIcons}
         columns={tableColumns}
-        data={data}
+        
+        
+        data={query=>                            /* With server-side pagination */
+          new Promise((resolve, reject) => {
+            // Prepare data and call the resolve like this
+            let url = "http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/words"; // .../n_pagina/n_registrosDeLaPagina         
+            url += "/" + (query.page + 1);
+            url += "/" + query.pageSize;
+            url += '?';   
+            if(query.search) {
+              url += `char=${query.search}`; 
+              console.log(url);
+            }
+             
+            if(query.orderBy) {
+              url += `&field=${query.orderBy.field}&order=${query.orderDirection}`; 
+            }
+
+            if(localStorage.getItem('minJugada') && localStorage.getItem('maxJugada')) {
+              url += `&min_played=${localStorage.getItem('minJugada')}&max_played=${localStorage.getItem('minJugada')}`;
+              document.getElementById('minJugada').value = localStorage.getItem('minJugada');
+              document.getElementById('maxJugada').value = localStorage.getItem('maxJugada');
+              localStorage.removeItem('minJugada');
+              localStorage.removeItem('maxJugada');
+            }
+
+            if(localStorage.getItem('minAdivinada') && localStorage.getItem('maxAdivinada')) {
+              url += `&min_guessed=${localStorage.getItem('minAdivinada')}&max_guessed=${localStorage.getItem('maxAdivinada')}`;
+              document.getElementById('minAdivinada').value = localStorage.getItem('minAdivinada');
+              document.getElementById('maxAdivinada').value = localStorage.getItem('maxAdivinada');
+              localStorage.removeItem('minAdivinada');
+              localStorage.removeItem('maxAdivinada');
+            }
+
+            fetch(url, {
+              headers: new Headers({
+                'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+              }),
+            }).then(resp=>resp.json()).then(resp => {
+                  
+                
+               console.log(resp.words_reports);
+              // console.log(resp.users.length);
+              if(resp.words_reports) {
+                resolve({
+                  data: resp.words_reports,
+                  page: query.page,
+                  totalCount: resp.count
+                });
+              }
+              
+
+            })
+          })
+        } 
+        
+        
         title="Reporte de palabras"
         options={{ search: true, filtering: false }}
         localization={{

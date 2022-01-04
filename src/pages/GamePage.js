@@ -83,15 +83,33 @@ function actualizarVidas() {
     document.getElementById('palabraActual').innerHTML = '¡Has perdido!';
     finJuego();
       
+  
+
   }
 }
 
-function EvaluarJuegoGanado() {
+async function EvaluarJuegoGanado() {
   if(!PALABRA_OCULTA_ACTUAL.includes('_')) {
     document.getElementById('evaluarLetraBtn').style.display = 'none';
     document.getElementById('letra').style.display = 'none';
     document.getElementById('notificacion').innerHTML = '¡Felicidades, has ganado!';
     finJuego();
+
+    // alert('haciendo request para palabra ' + PALABRA_JUEGO);
+    let reqData = {
+      "word": PALABRA_JUEGO
+    }  
+    console.log(reqData);
+  
+    const response = await axios.put('http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/words/guessed', reqData)
+    .then(resp=>{
+      console.log(resp.data);          
+    })  
+    .catch(error=>{
+      alert('Ha sucedido un error, por favor, inténtelo más tarde.');
+    });
+
+
   }
 }
 
