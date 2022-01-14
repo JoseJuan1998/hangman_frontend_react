@@ -44,9 +44,6 @@ class App extends Component {
 
       <div>{navbar}</div>    
       
-      // <AdminNavbar />
-      // <CapturadorNavbar />
-      // <UserNavbar />
     );
   }
 }

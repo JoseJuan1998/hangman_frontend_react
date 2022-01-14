@@ -47,7 +47,7 @@ function validateUser() {
 
 
  function setIntervaloDate() {
-  console.log('updating date');
+  // console.log('updating date');
 
   if(document.getElementById('minDate').value) {
     localStorage.setItem('minDate', document.getElementById('minDate').value);
@@ -75,9 +75,9 @@ function validateUser() {
             }
         }).then((response) => {
           var d = new Date();
-          d = new Date(d.getTime() - 3000000);
+          d = new Date(d.getTime() - 6);
           var date_format_str = d.getFullYear().toString()+"-"+((d.getMonth()+1).toString().length==2?(d.getMonth()+1).toString():"0"+(d.getMonth()+1).toString())+"-"+(d.getDate().toString().length==2?d.getDate().toString():"0"+d.getDate().toString())+" "+(d.getHours().toString().length==2?d.getHours().toString():"0"+d.getHours().toString())+":"+((parseInt(d.getMinutes()/5)*5).toString().length==2?(parseInt(d.getMinutes()/5)*5).toString():"0"+(parseInt(d.getMinutes()/5)*5).toString())+":00";
-          console.log(date_format_str);
+          // console.log(date_format_str);
         
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -196,7 +196,7 @@ export default function CustomEditComponent(props) {
             url += '?';   
             if(query.search) {
               url += `char=${query.search}`; 
-              console.log(url);
+              // console.log(url);
             }
              
             if(query.orderBy) {
@@ -219,11 +219,28 @@ export default function CustomEditComponent(props) {
                 
               if(resp.users_reports) {
 
-              
+                // console.log(resp.users_reports);
+                  
+               
+                  
                 for(let x = 0; x < resp.users_reports.length; x++) {
-                  let thisDate = resp.users_reports[x].date.split("T")[0];
-                  let thisTime = resp.users_reports[x].date.split("T")[1] + ' hrs';
-                  console.log([thisDate, thisTime])                  
+
+                  var d = new Date(resp.users_reports[x].date);
+                  d.setHours(d.getHours() - 6);
+                  var datestring = d.getDate()  + "-" + (d.getMonth()+1) + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes();
+
+                  // console.log('fecha: ' + datestring.toString());
+                  resp.users_reports[x].date = datestring.toString();
+
+                  
+                  let thisDate = resp.users_reports[x].date.split(" ")[0];
+                  
+                  let thisTime = resp.users_reports[x].date.split(" ")[1];
+                  let thisTimeHours = (thisTime.split(":")[0]).toString() + " hrs ";
+                  let thisTimeMinutes = (thisTime.split(":")[1]).toString() + " min ";
+                  thisTime = thisTimeHours + thisTimeMinutes;
+
+                  // console.log([thisDate, thisTime])                  
                   resp.users_reports[x].date = thisDate
                   resp.users_reports[x].time = thisTime                  
                 } // for
@@ -234,7 +251,7 @@ export default function CustomEditComponent(props) {
                     resp.users_reports[x].action = "Actualizada"; 
                   }              
                 }
-                console.log(resp.users_reports);
+                // console.log(resp.users_reports);
                 resolve({
                   data: resp.users_reports,
                   page: query.page,
