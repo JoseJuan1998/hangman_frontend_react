@@ -201,6 +201,7 @@ let listaPalabras = [];
             // console.log(resp)
             listaPalabras = resp.words;
             for(let x = 0; x < listaPalabras.length; x++) {
+              console.log(listaPalabras[x].difficulty);
               if(listaPalabras[x].difficulty == 'EASY') {
                 listaPalabras[x].difficulty = 'FACIL'; 
               } if(listaPalabras[x].difficulty == 'MEDIUM') {
@@ -208,13 +209,14 @@ let listaPalabras = [];
               } if(listaPalabras[x].difficulty == 'HARD') {
                 listaPalabras[x].difficulty = 'DIFICIL';
               }
-            }
+            } // for
             // console.log(listaPalabras);
-            setData(resp.words)            
+            setData(listaPalabras)            
         })
         .catch(error=>{
           alert('No ha sido posible comunicarse con el servidor. Inténtelo más tarde.');
           console.log(error.response);
+          setData([])
         });
     },[])
 
@@ -252,12 +254,46 @@ let listaPalabras = [];
                       }),
                     }).then(resp=>resp.json()).then(resp=>{
                       console.log(resp);
-                      resolve({
-                        data: resp.words,
-                        page: query.page,
-                        totalCount: resp.count
-                      });
+                      if(resp.words) {
+
+                        let listaPalabras; 
+                        // console.log(resp)
+                        listaPalabras = resp.words;
+                        for(let x = 0; x < listaPalabras.length; x++) {
+                          console.log(listaPalabras[x].difficulty);
+                          if(listaPalabras[x].difficulty == 'EASY') {
+                            listaPalabras[x].difficulty = 'FACIL'; 
+                          } if(listaPalabras[x].difficulty == 'MEDIUM') {
+                            listaPalabras[x].difficulty = 'INTERMEDIA'; 
+                          } if(listaPalabras[x].difficulty == 'HARD') {
+                            listaPalabras[x].difficulty = 'DIFICIL';
+                          }
+                        } // for
+                        // console.log(listaPalabras);
+                        setData(listaPalabras)  
+                        
+                        resolve({
+                          data: resp.words,
+                          page: query.page,
+                          totalCount: resp.count
+                        });
+                      } else {
+                        resolve({
+                          data: [],
+                          page: 0,
+                          totalCount: 0
+                        });
+                      }
+                      
                     })
+                    .catch(error=>{
+                      console.log(error.response);
+                      resolve({
+                        data: [],
+                        page: 0,
+                        totalCount: 0
+                      });
+                    });
                   })
                 }
 

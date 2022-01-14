@@ -36,6 +36,16 @@ import { makeStyles } from '@material-ui/core/styles';
 import DatePickerPage from "./DatePickerPage";
 
 
+function validateUser() {       
+  let permissions = localStorage.getItem('userType');
+  if(permissions != 1) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
  function setIntervaloDate() {
   console.log('updating date');
 
@@ -147,17 +157,27 @@ export default function CustomEditComponent(props) {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
   };
 
-  
+  let estilosInput = {
+    marginRight: '20px', 
+    border: 0, 
+    padding: '7px',
+    boxShadow: '2px 2px 6px #bbbbbb',
+    borderRadius: '5px'
+        
+  };
 
-  return (
-    
-    <Fragment>
-      
+  if(!validateUser()) {
+    window.location.replace('/');
+  } else {
+
+  
+  return (    
+    <Fragment>      
       <br /><br />      
       <MDBContainer>
       <p style={{ fontWeight: "bold" }}>Filtrar desde / Hasta </p>
-      <input id="minDate" onChange={setIntervaloDate} style={{ marginRight: '20px' }} type="date"></input>      
-      <input id="maxDate" onChange={setIntervaloDate} style={{ marginRight: '20px' }} type="date"></input>
+      <input id="minDate" onChange={setIntervaloDate} style={estilosInput} type="date"></input>      
+      <input id="maxDate" onChange={setIntervaloDate} style={estilosInput} type="date"></input>
       <div className="text-right">
         <MDBBtn color="red" onClick={descargarReporte}>Descargar reporte general</MDBBtn>
       </div>
@@ -196,33 +216,45 @@ export default function CustomEditComponent(props) {
                 'Authorization': localStorage.getItem('TOKEN_AUTH'), 
               }),
             }).then(resp=>resp.json()).then(resp => {
-                  
+                
+              if(resp.users_reports) {
+
+              
                 for(let x = 0; x < resp.users_reports.length; x++) {
                   let thisDate = resp.users_reports[x].date.split("T")[0];
                   let thisTime = resp.users_reports[x].date.split("T")[1] + ' hrs';
                   console.log([thisDate, thisTime])                  
                   resp.users_reports[x].date = thisDate
-                  resp.users_reports[x].time = thisTime
-                  // resp.users_reports[x].time = (resp.users_reports[x].date.split("T")[1]).toString();
-                  
-
+                  resp.users_reports[x].time = thisTime                  
+                } // for
+                for(let x = 0; x < resp.users_reports.length; x++) {
+                  if(resp.users_reports[x].action == "INSERT" ) {
+                    resp.users_reports[x].action = "Insertada";
+                  } else if(resp.users_reports[x].action == "UPDATE" ) {
+                    resp.users_reports[x].action = "Actualizada"; 
+                  }              
                 }
-
-                 for(let x = 0; x < resp.users_reports.length; x++) {
-                   if(resp.users_reports[x].action == "INSERT" ) {
-                     resp.users_reports[x].action = "Insertada";
-                   } else if(resp.users_reports[x].action == "UPDATE" ) {
-                     resp.users_reports[x].action = "Actualizada"; 
-                   }              
-                 }
-               console.log(resp.users_reports);
-              // console.log(resp.users.length);
-              resolve({
-                data: resp.users_reports,
-                page: query.page,
-                totalCount: resp.count
-              });
+                console.log(resp.users_reports);
+                resolve({
+                  data: resp.users_reports,
+                  page: query.page,
+                  totalCount: resp.count
+                });
+              } else {
+                resolve({
+                  data: [],
+                  page: 0,
+                  totalCount: 0
+                });
+              }  
             })
+            .catch(error=>{
+              resolve({
+                data: [],
+                page: 0,
+                totalCount: 0
+              });
+            });
           })
         } 
 
@@ -252,5 +284,6 @@ export default function CustomEditComponent(props) {
       />      
     </MDBContainer>
     </Fragment>
-  );
+  ); // return
+}
 }

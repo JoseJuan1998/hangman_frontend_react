@@ -224,6 +224,7 @@ async function getUsers() {
         .catch(error=>{
           alert('No ha sido posible comunicarse con el servidor. Inténtelo más tarde.');
           console.log(error.response);
+          setData([])
         });
     },[])
 
@@ -273,6 +274,14 @@ async function getUsers() {
                         totalCount: resp.count
                       });
                     })
+                    .catch(error=>{
+                      console.log(error.response);
+                      resolve({
+                        data: [],
+                        page: 0,
+                        totalCount: 0
+                      });
+                    });
                   })
                 }    
 

@@ -195,6 +195,7 @@ function mapDifficulty(difficulty) {
     case 'HARD': x = 'DIFICIL'; break;
     case 'MEDIUM': x = 'INTERMEDIO'; break;
     case 'EASY': x = 'FACIL'; break;
+    case 'RANDOM': x = 'RANDOM'; break;
     default: window.location.replace('/');    
   }
   return x; 

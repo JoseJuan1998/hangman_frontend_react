@@ -8,7 +8,6 @@ function validateUser() {
   const id = queryParams.get('id');
   const token = queryParams.get('token');
   localStorage.setItem('REMEMBER_PASSWORD_TOKEN', token);
-  console.log(id);
   let permissions = localStorage.getItem('userType');
   if(id && id != null && token && token != null  && permissions == null ) {
     return true;

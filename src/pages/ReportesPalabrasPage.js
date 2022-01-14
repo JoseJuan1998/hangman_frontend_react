@@ -34,9 +34,24 @@ import { Modal, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import DatePickerPage from "./DatePickerPage";
 
-function setIntervaloJugada() {
+
+function validateUser() {       
+  let permissions = localStorage.getItem('userType');
+  if(permissions != 1) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function setIntervaloJugada() {  
   console.log('updating');
   if(document.getElementById('minJugada').value) {
+    let positiveInteger = /^([0-9]*)$/.test(document.getElementById('minJugada').value);
+    if(!positiveInteger) {
+      alert('not positive integer integer');
+    }
+
     localStorage.setItem('minJugada', document.getElementById('minJugada').value);
   }
   if(document.getElementById('maxJugada').value) {
@@ -159,25 +174,32 @@ export default function CustomEditComponent(props) {
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
   };
-
     let inputStyles = {
-        marginRight: '20px', 
-        marginBottom: '10px', 
-        width: '160px'
+      marginRight: '20px', 
+      marginBottom: '10px',
+      width: '160px',
+      border: 0, 
+      padding: '5px',
+      boxShadow: '2px 2px 6px #bbbbbb',
+      borderRadius: '5px'
+          
     };
+  
+  if(!validateUser()) {
+    window.location.replace('/');
+  } else {
 
+  
   return (
-   
-
     <Fragment>
       
       <br /><br />      
       <MDBContainer>
-      <input placeholder="Min. Jugada" id="minJugada" onChange={setIntervaloJugada} style={inputStyles} type="number"></input>      
-      <input placeholder="Max. Jugada" id="maxJugada" onChange={setIntervaloJugada} style={inputStyles} type="number"></input>
+      <input placeholder="Min. Jugada" id="minJugada" onInput={setIntervaloJugada} style={inputStyles} type="number" min="0" pattern="[0-9]+"></input>      
+      <input placeholder="Max. Jugada" id="maxJugada" onInput={setIntervaloJugada} style={inputStyles} type="number" min="0" pattern="[0-9]+"></input>
       <br />
-      <input placeholder="Min. Adivinada" id="minAdivinada" onChange={setIntervaloAdivinada} style={inputStyles} type="number"></input>      
-      <input placeholder="Max. Adivinada" id="maxAdivinada" onChange={setIntervaloAdivinada} style={inputStyles} type="number"></input>
+      <input placeholder="Min. Adivinada" id="minAdivinada" onInput={setIntervaloAdivinada} style={inputStyles} type="number" min="0" pattern="[0-9]+"></input>      
+      <input placeholder="Max. Adivinada" id="maxAdivinada" onInput={setIntervaloAdivinada} style={inputStyles} type="number" min="0" pattern="[0-9]+"></input>
 
       <div className="text-right">
         <MDBBtn color="red" onClick={descargarReporte}>Descargar reporte general</MDBBtn>
@@ -225,9 +247,7 @@ export default function CustomEditComponent(props) {
                 'Authorization': localStorage.getItem('TOKEN_AUTH'), 
               }),
             }).then(resp=>resp.json()).then(resp => {
-                  
-                
-               console.log(resp.words_reports);
+              console.log(resp.words_reports);
               // console.log(resp.users.length);
               if(resp.words_reports) {
                 resolve({
@@ -235,10 +255,21 @@ export default function CustomEditComponent(props) {
                   page: query.page,
                   totalCount: resp.count
                 });
+              } else {
+                resolve({
+                  data: [],
+                  page: 0,
+                  totalCount: 0
+                });
               }
-              
-
             })
+            .catch(error=>{
+              resolve({
+                data: [],
+                page: 0,
+                totalCount: 0
+              });
+            });
           })
         } 
         
@@ -267,5 +298,6 @@ export default function CustomEditComponent(props) {
       />      
     </MDBContainer>
     </Fragment>
-  );
+  ); // return
+}
 }
