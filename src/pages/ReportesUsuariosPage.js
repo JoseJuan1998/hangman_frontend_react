@@ -67,11 +67,11 @@ function validateUser() {
  async function descargarReporte() {
 
           axios({
-            url: 'http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/users/pdf', //your url
+            url: 'http://localhost:4003/manager/report/users/pdf', //your url
             method: 'GET',
             responseType: 'blob', // important
             headers: {
-              Authorization: localStorage.getItem('TOKEN_AUTH')
+              Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH')
             }
         }).then((response) => {
           var d = new Date();
@@ -190,7 +190,7 @@ export default function CustomEditComponent(props) {
         data={query=>                            /* With server-side pagination */
           new Promise((resolve, reject) => {
             // Prepare data and call the resolve like this
-            let url = "http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/users"; // .../n_pagina/n_registrosDeLaPagina         
+            let url = "http://localhost:4003/manager/report/users"; // .../n_pagina/n_registrosDeLaPagina         
             url += "/" + (query.page + 1);
             url += "/" + query.pageSize;
             url += '?';   
@@ -213,7 +213,7 @@ export default function CustomEditComponent(props) {
 
             fetch(url, {
               headers: new Headers({
-                'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                'Authorization': "Bearer " + localStorage.getItem('TOKEN_AUTH'), 
               }),
             }).then(resp=>resp.json()).then(resp => {
                 

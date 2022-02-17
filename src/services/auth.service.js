@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "hangmangame1-usuarios.eastus.cloudapp.azure.com:4001";
+const API_URL = "localhost:4001";
 
 class AuthService {
   login(username, password) {

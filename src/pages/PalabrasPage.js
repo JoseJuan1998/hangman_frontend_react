@@ -42,9 +42,9 @@ async function registrarPalabra(validacion) {
           "word": palabra
         }
         const config = {
-          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+          headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
         };
-        const response = await axios.post('http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words', reqData, config)
+        const response = await axios.post('http://localhost:4002/manager/words', reqData, config)
         .then(resp=>{
           console.log(resp.data);          
           window.location.reload(false);

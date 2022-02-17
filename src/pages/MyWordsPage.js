@@ -64,9 +64,9 @@ let listaPalabras = [];
     // alert('eliminando a ' + wordToDelete);
     console.log(rowData); 
     const config = {
-      headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+      headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
     };
-    const response = await axios.delete('http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words/' + wordToDelete,
+    const response = await axios.delete('http://localhost:4002/manager/words/' + wordToDelete,
     config);
     window.location.reload(false);
  } // eliminarPalabra()
@@ -86,10 +86,10 @@ let listaPalabras = [];
             "word":  document.getElementById('PalabraEditar').value, 
             }    
         const config = {
-          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+          headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
         };
         const response = await axios.put(
-          'http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words/' + palabra.palabraSeleccionada.id, 
+          'http://localhost:4002/manager/words/' + palabra.palabraSeleccionada.id, 
           reqData, config);
         window.location.reload(false);
 
@@ -190,9 +190,9 @@ let listaPalabras = [];
       
     // Obtenemos palabras de la base de datos
     useEffect(()=>{
-        fetch('http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words/1/100', {
+        fetch('http://localhost:4002/manager/words/1/100', {
           headers: new Headers({
-            'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+            'Authorization': "Bearer " + localStorage.getItem('TOKEN_AUTH'), 
           }), 
         })
         .then(resp=>resp.json())
@@ -234,7 +234,7 @@ let listaPalabras = [];
                 data={query=>                                  /* With server-side pagination */
                   new Promise((resolve, reject) => {
                     // Prepare data and call the resolve like this
-                    let url = "http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/manager/words"; // .../n_pagina/n_registrosDeLaPagina         
+                    let url = "http://localhost:4002/manager/words"; // .../n_pagina/n_registrosDeLaPagina         
                     url += "/" + (query.page + 1);
                     url += "/" + query.pageSize;
                     url += '?'; 
@@ -250,7 +250,7 @@ let listaPalabras = [];
 
                     fetch(url, {
                       headers: new Headers({
-                        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                        'Authorization': "Bearer " + localStorage.getItem('TOKEN_AUTH'), 
                       }),
                     }).then(resp=>resp.json()).then(resp=>{
                       console.log(resp);

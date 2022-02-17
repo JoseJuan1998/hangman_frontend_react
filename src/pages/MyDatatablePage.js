@@ -62,7 +62,7 @@ async function getUsers() {
     let myUsers = [];
         const response = await axios({
             method: 'get',
-            url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/1/100'
+            url: 'http://localhost:4001/manager/users/1/100'
         });
         for(let i = 0; i < response.data.users.length; i++) {
             myUsers.push({
@@ -81,16 +81,16 @@ async function getUsers() {
     // alert('eliminando a ' + userToDelete);
     console.log(userToDelete)
     const config = {
-      headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+      headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
     };
 
     // const response = await axios({
     //     method: 'delete',
-    //     url: 'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete
+    //     url: 'http://localhost:4001/manager/users/' + userToDelete
     // });
 
     const response = await axios.delete(
-        'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + userToDelete, 
+        'http://localhost:4001/manager/users/' + userToDelete, 
         config
     );
 
@@ -107,11 +107,11 @@ async function getUsers() {
         "lastname":  document.getElementById('ApellidoEditar').value, 
       };
       const config = {
-        headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+        headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
       };
 
       const response = await axios.put(
-        'http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/name/' + usuario.usuarioSeleccionado.id, 
+        'http://localhost:4001/manager/users/name/' + usuario.usuarioSeleccionado.id, 
         reqData, config);
       // console.log(reqData);
       // console.log(usuario.usuarioSeleccionado.id);
@@ -202,9 +202,9 @@ async function getUsers() {
     ];
 
     useEffect(()=>{
-        fetch('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/1/100', {
+        fetch('http://localhost:4001/manager/users/1/100', {
           headers: new Headers({
-            'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+            'Authorization': "Bearer " + localStorage.getItem('TOKEN_AUTH'), 
           }), 
         })
         .then(resp=>resp.json())
@@ -242,7 +242,7 @@ async function getUsers() {
                 data={query=>                            /* With server-side pagination */
                   new Promise((resolve, reject) => {
                     // Prepare data and call the resolve like this
-                    let url = "http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users"; // .../n_pagina/n_registrosDeLaPagina         
+                    let url = "http://localhost:4001/manager/users"; // .../n_pagina/n_registrosDeLaPagina         
                     url += "/" + (query.page + 1);
                     url += "/" + query.pageSize;
                     url += '?'; 
@@ -256,7 +256,7 @@ async function getUsers() {
                     }
                     fetch(url, {
                       headers: new Headers({
-                        'Authorization': localStorage.getItem('TOKEN_AUTH'), 
+                        'Authorization': "Bearer " + localStorage.getItem('TOKEN_AUTH'), 
                       }),
                     }).then(resp=>resp.json()).then(resp=>{
                        for(let x = 0; x < resp.users.length; x++) {

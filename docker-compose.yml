@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    command: /bin/sh docker_dev_start.sh
+    ports:
+      - "3001:3000"

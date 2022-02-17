@@ -39,7 +39,7 @@ async function rememberPassword(validacion) {
               "email": email
             }
             
-          const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/reset/pass', reqData)
+          const response = await axios.post('http://localhost:4001/manager/users/reset/pass', reqData)
           .then(resp=>{
             console.log(resp.data);
             document.getElementById('emailRemember').style.display = 'none';
@@ -69,7 +69,7 @@ async function rememberPassword(validacion) {
   } // rememberPassword()
 
   async function tempLogout() {
-    const response = await axios.delete('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/logout')
+    const response = await axios.delete('http://localhost:4001/manager/logout')
     .then(resp=>{
       console.log(resp.data);
     })  

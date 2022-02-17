@@ -21,7 +21,7 @@ import Routes from '../Routes';
 import axios from 'axios';
 
 async function logout() {
-  const response = await axios.delete('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/logout')
+  const response = await axios.delete('http://localhost:4001/manager/logout')
   .then(resp=>{
     console.log(resp.data);
     window.location.replace('/login');

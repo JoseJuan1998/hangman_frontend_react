@@ -46,9 +46,9 @@ async function registrarUsuario(validacion) {
         }  
         console.log(reqData);
         const config = {
-          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+          headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
         };
-        const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users', reqData, config)
+        const response = await axios.post('http://localhost:4001/manager/users', reqData, config)
         .then(resp=>{
           console.log(resp.data);          
           window.location.reload(false);

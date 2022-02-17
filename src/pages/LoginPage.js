@@ -29,9 +29,9 @@ async function getUserInfo(id) {
         
         // Si existe usuario, obtenemos sus datos
         const config = {
-          headers: { Authorization: localStorage.getItem('TOKEN_AUTH') }
+          headers: { Authorization: "Bearer " + localStorage.getItem('TOKEN_AUTH') }
         };
-        const response = axios.get('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/' + id, config)
+        const response = axios.get('http://localhost:4001/manager/users/' + id, config)
         .then(resp=>{          
           console.log('second request');          
           respData = resp.data.user;
@@ -76,13 +76,13 @@ async function login(validacion) {
         "password": password,
         "email": email
       }
-      const response = await axios.post('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/login', reqData)
+      const response = await axios.post('http://localhost:4001/manager/login', reqData)
       .then(resp=>{
 
         console.log(resp.data); // request response's data
 
-        let userId = resp.data.user_id;
-        localStorage.setItem('TOKEN_AUTH', resp.data.token_auth);
+        let userId = resp.data.user.id;
+        localStorage.setItem('TOKEN_AUTH', resp.data.token);
         // alert(userId);
 
         let userInfo = getUserInfo(userId);
@@ -113,7 +113,7 @@ async function login(validacion) {
 } // login()
 
 async function tempLogout() {
-  const response = await axios.delete('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/logout')
+  const response = await axios.delete('http://localhost:4001/manager/logout')
   .then(resp=>{
     console.log(resp.data);
   })  

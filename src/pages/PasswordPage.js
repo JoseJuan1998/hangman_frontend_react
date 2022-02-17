@@ -58,15 +58,15 @@ async function crearContrasena() {
           }
 
           const config = {
-            headers: { Authorization: localStorage.getItem('REMEMBER_PASSWORD_TOKEN') }
+            headers: { Authorization: "Bearer " + localStorage.getItem('REMEMBER_PASSWORD_TOKEN') }
           };
 
           // Pendiente: incluir headers de configuracion
           document.getElementById('loadingLogo').style.display = 'flex';
-          const response = await axios.put('http://hangmangame1-usuarios.eastus.cloudapp.azure.com:4001/manager/users/pass/' + id, reqData, config)
+          const response = await axios.put('http://localhost:4001/manager/users/pass/' + id, reqData, config)
           .then(resp=>{
             console.log(resp.data);
-            let userId = resp.data.user_id;
+            let userId = resp.data.user.id;
             // alert(userId);
 
             document.getElementById('aceptar').style.display = 'inline';

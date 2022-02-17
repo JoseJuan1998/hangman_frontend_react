@@ -46,7 +46,7 @@ function validateUser() {
   } // salirDelJuego
 
   async function obtenerPalabra() {
-    let palabra = await axios.get('http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word/' + localStorage.getItem("difficulty"));
+    let palabra = await axios.get('http://localhost:4002/game/word/' + localStorage.getItem("difficulty"));
     console.log("Palabra ----------------");
     // alert(palabra.data.word.word);
     palabra = palabra.data.word.word;
@@ -101,7 +101,7 @@ async function EvaluarJuegoGanado() {
     }  
     console.log(reqData);
   
-    const response = await axios.put('http://reportes-icorp.eastus.cloudapp.azure.com:4001/manager/report/words/guessed', reqData)
+    const response = await axios.put('http://localhost:4003/manager/report/words/guessed', reqData)
     .then(resp=>{
       console.log(resp.data);          
     })  
@@ -207,9 +207,9 @@ document.addEventListener("DOMContentLoaded", function() {
         let palabra;
         let url; 
         if(localStorage.getItem("difficulty") != 'RANDOM') {
-          url = 'http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word/' + localStorage.getItem("difficulty"); 
+          url = 'http://localhost:4002/game/word/' + localStorage.getItem("difficulty"); 
         } else {
-          url = 'http://hangmangame1-palabras.eastus.cloudapp.azure.com:4001/game/word'; 
+          url = 'http://localhost:4002/game/word'; 
         }
         const response = axios.get(url)
         .then(resp=>{
